@@ -1,0 +1,31 @@
+name: Render demo
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate foundation
+        run: npm run check
+      - name: Render
+        run: npm run render:remotion
+      - name: Probe result
+        run: npm run probe -- output/remotion-demo.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video-studio-demo
+          path: |
+            output/remotion-demo.mp4
+            package-lock.json
