@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts ProductDemo ../../output/remotion-demo.mp4 --codec=h264",
+    "render": "remotion render src/index.ts ProductDemo ../../output/remotion-demo.mp4 --codec=h264 --props ../../projects/demo-product/project.json",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -13,12 +13,12 @@
     "@remotion/player": "4.0.528",
     "@remotion/three": "4.0.528",
     "@react-three/fiber": "9.2.0",
+    "@video-studio/contracts": "0.1.0",
     "@video-studio/design-system": "0.1.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.528",
-    "three": "0.178.0",
-    "@video-studio/contracts": "0.1.0"
+    "three": "0.178.0"
   },
   "devDependencies": {
     "@types/react": "19.2.7",
