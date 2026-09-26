@@ -12,6 +12,7 @@
     "dev:motion-canvas": "npm --workspace @video-studio/motion-canvas-studio run dev",
     "smoke": "node scripts/smoke-foundation.mjs",
     "verify:deps": "node scripts/verify-dependency-contract.mjs",
+    "verify:render": "node scripts/verify-render.mjs",
     "validate:demo": "node scripts/validate-project.mjs projects/demo-product/project.json",
     "check": "node scripts/check-env.mjs && npm run smoke && npm run typecheck",
     "probe": "node scripts/probe-media.mjs",

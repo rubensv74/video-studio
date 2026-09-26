@@ -30,6 +30,8 @@ packages/contracts/src/index.ts
 packages/design-system/package.json
 packages/design-system/src/index.ts
 projects/demo-product/project.json
+scripts/bootstrap-unix.sh
+scripts/bootstrap-windows.ps1
 scripts/check-env.mjs
 scripts/lib/dependency-contract.mjs
 scripts/lib/manifest.mjs
@@ -39,3 +41,4 @@ scripts/render.mjs
 scripts/smoke-foundation.mjs
 scripts/validate-project.mjs
 scripts/verify-dependency-contract.mjs
+scripts/verify-render.mjs

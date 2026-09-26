@@ -17,18 +17,26 @@ Verified at repository/source level:
 - FFmpeg and ffprobe tooling scripts;
 - manifest validation and render dispatcher scripts;
 - dependency alignment contract;
+- dependency-free source smoke gate;
 - CI workflow structure.
 
-### Reproduced source-contract smoke evidence
+### Reproduced source-contract evidence
 
-The current PR source was reconstructed outside GitHub Actions and `node scripts/smoke-foundation.mjs` passed:
+The current PR source was reconstructed outside GitHub Actions and the following passed:
+
+- `node scripts/smoke-foundation.mjs`;
+- `node scripts/verify-dependency-contract.mjs`.
+
+Verified assertions include:
 
 - manifest validation;
 - demo timing = 10 seconds / 300 frames;
 - manifest -> Remotion `--props` render plan;
 - `calculateMetadata()` owns width, height, FPS and duration;
 - `ProductDemo` consumes manifest scenes;
-- dependency version contract;
+- Remotion family alignment at 4.0.528;
+- Remotion official 3D dependency baseline;
+- Motion Canvas family alignment at 3.17.2;
 - official Motion Canvas TypeScript base;
 - Motion Canvas FFmpeg exporter configuration.
 
@@ -42,7 +50,7 @@ See `docs/dependency-baseline.md`.
 
 ### Current CI infrastructure observation
 
-GitHub Actions runs #1, #2 and #3 were triggered successfully by PR #1, but terminated before a runner was assigned: `runner_id=0`, empty runner name and no workflow steps. Therefore those failures are not evidence of a source, npm, TypeScript or render failure.
+GitHub Actions runs #1 through #4 were triggered successfully by PR #1, but terminated before a runner was assigned: `runner_id=0`, empty runner name and no workflow steps. Therefore those failures are not evidence of a source, npm, TypeScript or render failure.
 
 Tracked separately in issue #2: **CI-G01 — GitHub Actions runner not allocated**.
 
@@ -51,6 +59,7 @@ Runtime evidence still required:
 - npm dependency resolution;
 - TypeScript compilation against installed packages;
 - first physical MP4 render;
+- rendered-media contract verification;
 - generated `package-lock.json` committed after dependency resolution.
 
 ## VS-G02 — First verified render
@@ -60,8 +69,13 @@ Exit criteria:
 1. `npm install` succeeds.
 2. A lockfile is generated and committed.
 3. `npm run check` passes, including both TypeScript workspaces.
-4. `npm run render:remotion` produces `output/remotion-demo.mp4`.
-5. `npm run probe -- output/remotion-demo.mp4` verifies H.264, 1920x1080 and the expected duration.
+4. `npm run render -- projects/demo-product/project.json` produces `output/remotion-demo.mp4`.
+5. `npm run verify:render -- projects/demo-product/project.json` passes:
+   - H.264;
+   - 1920x1080;
+   - 30 FPS;
+   - expected duration within tolerance;
+   - non-zero media size.
 6. The GitHub Actions workflow reproduces the render and stores the MP4 as an artifact.
 
 ## VS-G03 — Media stack

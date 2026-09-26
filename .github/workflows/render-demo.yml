@@ -22,9 +22,9 @@ jobs:
       - name: Validate foundation
         run: npm run check
       - name: Render
-        run: npm run render:remotion
-      - name: Probe result
-        run: npm run probe -- output/remotion-demo.mp4
+        run: npm run render -- projects/demo-product/project.json
+      - name: Verify rendered media
+        run: npm run verify:render -- projects/demo-product/project.json
       - uses: actions/upload-artifact@v4
         with:
           name: video-studio-demo
