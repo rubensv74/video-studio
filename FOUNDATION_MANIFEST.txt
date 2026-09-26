@@ -1,5 +1,6 @@
 .env.example
 .github/workflows/render-demo.yml
+.github/workflows/runner-diagnostic.yml
 .gitignore
 README.md
 apps/motion-canvas-studio/package.json
@@ -23,6 +24,7 @@ docs/gates.md
 docs/licensing.md
 docs/project-manifest.md
 docs/rendering.md
+docs/runner-diagnostic.md
 output/.gitkeep
 package.json
 packages/contracts/package.json
