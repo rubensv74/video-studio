@@ -12,12 +12,15 @@ Verified at repository/source level:
 - Remotion input-prop path from `project.json`;
 - manifest-driven Remotion metadata: width, height, FPS and total duration;
 - manifest-driven Remotion semantic scene payloads;
+- local-vs-global frame timing reconciled for sequenced scenes;
 - Motion Canvas project aligned with the official `@motion-canvas/2d/tsconfig.project.json` base;
 - Motion Canvas FFmpeg exporter configuration;
 - FFmpeg and ffprobe tooling scripts;
 - manifest validation and render dispatcher scripts;
 - dependency alignment contract;
 - dependency-free source smoke gate;
+- strict rendered-media verifier;
+- Windows and Unix end-to-end bootstrap scripts;
 - CI workflow structure.
 
 ### Reproduced source-contract evidence
@@ -40,6 +43,30 @@ Verified assertions include:
 - official Motion Canvas TypeScript base;
 - Motion Canvas FFmpeg exporter configuration.
 
+### Render-verifier evidence
+
+`scripts/verify-render.mjs` was exercised independently with FFmpeg-generated fixtures:
+
+**Positive fixture**
+
+- H.264;
+- 1920x1080;
+- 30 FPS;
+- 10.000 s;
+- non-zero file size.
+
+Result: **PASS**.
+
+**Negative fixture**
+
+- 1280x720;
+- 24 FPS;
+- 2.000 s.
+
+Result: **FAIL**, correctly reporting width, height, FPS and duration mismatches.
+
+This proves the verifier is not a permissive probe; it rejects media that violates the manifest contract. It does **not** substitute for the required Remotion render.
+
 ### Dependency evidence
 
 The Remotion 4.0.528 package family exists upstream and the 3D pins match Remotion's official `template-three` at `v4.0.528`.
@@ -50,7 +77,7 @@ See `docs/dependency-baseline.md`.
 
 ### Current CI infrastructure observation
 
-GitHub Actions runs #1 through #4 were triggered successfully by PR #1, but terminated before a runner was assigned: `runner_id=0`, empty runner name and no workflow steps. Therefore those failures are not evidence of a source, npm, TypeScript or render failure.
+GitHub Actions runs #1 through #5 were triggered successfully by PR #1, but terminated before a runner was assigned: `runner_id=0`, empty runner name and no workflow steps. Therefore those failures are not evidence of a source, npm, TypeScript or render failure.
 
 Tracked separately in issue #2: **CI-G01 — GitHub Actions runner not allocated**.
 
@@ -58,8 +85,8 @@ Runtime evidence still required:
 
 - npm dependency resolution;
 - TypeScript compilation against installed packages;
-- first physical MP4 render;
-- rendered-media contract verification;
+- first physical Remotion MP4 render;
+- rendered-media contract verification against that Remotion output;
 - generated `package-lock.json` committed after dependency resolution.
 
 ## VS-G02 — First verified render
@@ -77,6 +104,8 @@ Exit criteria:
    - expected duration within tolerance;
    - non-zero media size.
 6. The GitHub Actions workflow reproduces the render and stores the MP4 as an artifact.
+
+The local bootstrap scripts execute steps 1, 3, 4 and 5 automatically and verify that the lockfile was produced.
 
 ## VS-G03 — Media stack
 

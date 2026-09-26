@@ -40,26 +40,42 @@ Prerequisites:
 
 - Node.js 20+
 - npm
-- FFmpeg available in PATH for post-processing and Motion Canvas video export
+- FFmpeg and ffprobe available in PATH
+
+The recommended path is the end-to-end bootstrap because it does not stop at compilation: it renders and verifies the media file.
+
+Windows PowerShell:
+
+```powershell
+./scripts/bootstrap-windows.ps1
+```
+
+Linux/macOS:
+
+```bash
+./scripts/bootstrap-unix.sh
+```
+
+Manual path:
 
 ```bash
 npm install
 npm run check
-npm run dev:remotion
-```
-
-Remotion Studio will show the included `ProductDemo` composition.
-
-Render the reference composition:
-
-```bash
-npm run render:remotion
+npm run render -- projects/demo-product/project.json
+npm run verify:render -- projects/demo-product/project.json
 ```
 
 Expected output:
 
 ```text
 output/remotion-demo.mp4
+package-lock.json
+```
+
+Remotion Studio:
+
+```bash
+npm run dev:remotion
 ```
 
 Motion Canvas specialist editor:
@@ -78,21 +94,37 @@ Projects live under `projects/<project-id>/project.json` and describe output geo
 npm run render -- projects/demo-product/project.json
 ```
 
-The current orchestrator validates the manifest and dispatches to the selected engine. The reference Remotion composition consumes manifest output metadata, scene durations and semantic payloads; the demo project uses Remotion.
+The orchestrator validates the manifest and dispatches to the selected engine. For Remotion, the manifest is passed through `--props`, `calculateMetadata()` derives physical video metadata from it, and scene implementations consume the same semantic payload.
 
 ## Status
 
-Foundation Gate `VS-G01`:
+### VS-G01 — Multi-engine foundation
+
+Source contract verified:
 
 - [x] Engine-neutral project contract
-- [x] Remotion reference composition source
+- [x] Manifest-driven Remotion metadata and scene payloads
 - [x] Motion Canvas specialist workspace
 - [x] FFmpeg post-processing entry point
-- [x] Environment and manifest validation
-- [x] CI workflow skeleton with PR validation
-- [x] Capability and licensing documentation
-- [ ] Install dependencies and execute first physical render on a network-enabled workstation/runner
-- [ ] Generate and commit `package-lock.json` after the first successful install
+- [x] Environment, manifest and dependency validation
+- [x] Dependency-free smoke gate
+- [x] Rendered-media verifier tested with positive and negative FFmpeg fixtures
+- [x] CI workflow defined
+- [x] Capability, licensing, dependency and gate documentation
 - [x] Permanent repository established: `rubensv74/video-studio`
 
-The next real gate is `VS-G02 — First Verified Render`.
+### VS-G02 — First Verified Render
+
+Still required:
+
+- [ ] Resolve GitHub-hosted runner allocation or use a network-enabled local runner
+- [ ] `npm install`
+- [ ] Generate and commit `package-lock.json`
+- [ ] TypeScript checks against installed dependencies
+- [ ] Physical Remotion H.264 render
+- [ ] Media-contract verification against the real Remotion output
+- [ ] GitHub Actions artifact
+
+Current CI blocker is tracked in issue #2.
+
+See `docs/gates.md` and `docs/rendering.md` for the exact exit criteria.
