@@ -77,7 +77,7 @@ See `docs/dependency-baseline.md`.
 
 ### Current CI infrastructure observation
 
-GitHub Actions runs #1 through #5 were triggered successfully by PR #1, but terminated before a runner was assigned: `runner_id=0`, empty runner name and no workflow steps. Therefore those failures are not evidence of a source, npm, TypeScript or render failure.
+PR-triggered GitHub Actions runs consistently terminate before a runner is assigned: `runner_id=0`, empty runner name and no workflow steps. Repeated executions have reproduced the same pre-runner condition, so these failures are not evidence of a source, npm, TypeScript or render failure.
 
 Tracked separately in issue #2: **CI-G01 — GitHub Actions runner not allocated**.
 
