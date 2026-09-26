@@ -1,28 +1,32 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {
+  buildRemotionRenderPlan,
+  loadProjectManifest,
+  validateProject,
+} from './lib/manifest.mjs';
 
 const manifestFile = process.argv[2] || 'projects/demo-product/project.json';
-const full = path.resolve(manifestFile);
-const project = JSON.parse(fs.readFileSync(full, 'utf8'));
+const {project, fullPath} = loadProjectManifest(manifestFile);
+const errors = validateProject(project);
 
-const validate = spawnSync(process.execPath, ['scripts/validate-project.mjs', manifestFile], {
-  stdio: 'inherit',
-});
-if (validate.status !== 0) process.exit(validate.status ?? 1);
+if (errors.length) {
+  for (const error of errors) console.error(`FAIL ${error}`);
+  process.exit(1);
+}
 
 if (project.engine === 'remotion') {
-  if (!['mp4', 'webm'].includes(project.output.format)) {
-    console.error(
-      `Remotion dispatcher supports mp4/webm in VS-G01. Use FFmpeg derivatives for ${project.output.format} until the media-stack gate is implemented.`,
-    );
+  let plan;
+  try {
+    plan = buildRemotionRenderPlan(project, fullPath);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
     process.exit(4);
   }
 
-  const output = path.resolve(project.output.file);
-  fs.mkdirSync(path.dirname(output), {recursive: true});
+  fs.mkdirSync(path.dirname(plan.outputFile), {recursive: true});
 
-  const codec = project.output.format === 'webm' ? 'vp8' : 'h264';
   const args = [
     '--workspace',
     '@video-studio/remotion-studio',
@@ -31,12 +35,12 @@ if (project.engine === 'remotion') {
     'remotion',
     'render',
     'src/index.ts',
-    project.compositionId,
-    output,
+    plan.compositionId,
+    plan.outputFile,
     '--codec',
-    codec,
+    plan.codec,
     '--props',
-    full,
+    plan.propsFile,
   ];
 
   const result = spawnSync('npm', args, {stdio: 'inherit'});
