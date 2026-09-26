@@ -18,6 +18,8 @@ apps/remotion-studio/tsconfig.json
 assets/README.md
 docs/architecture.md
 docs/capability-matrix.md
+docs/dependency-baseline.md
+docs/gates.md
 docs/licensing.md
 docs/project-manifest.md
 docs/rendering.md
@@ -29,7 +31,11 @@ packages/design-system/package.json
 packages/design-system/src/index.ts
 projects/demo-product/project.json
 scripts/check-env.mjs
+scripts/lib/dependency-contract.mjs
+scripts/lib/manifest.mjs
 scripts/postprocess.mjs
 scripts/probe-media.mjs
 scripts/render.mjs
+scripts/smoke-foundation.mjs
 scripts/validate-project.mjs
+scripts/verify-dependency-contract.mjs

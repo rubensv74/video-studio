@@ -8,6 +8,7 @@ import {
   loadProjectManifest,
   validateProject,
 } from './lib/manifest.mjs';
+import {verifyDependencyContract} from './lib/dependency-contract.mjs';
 
 const root = process.cwd();
 const manifestFile = path.join(root, 'projects/demo-product/project.json');
@@ -45,6 +46,15 @@ const remotionPackage = JSON.parse(
 assert.match(remotionPackage.scripts.render, /--props/);
 assert.match(remotionPackage.scripts.render, /projects\/demo-product\/project\.json/);
 
+const motionCanvasPackage = JSON.parse(
+  fs.readFileSync(path.join(root, 'apps/motion-canvas-studio/package.json'), 'utf8'),
+);
+assert.deepEqual(
+  verifyDependencyContract({remotionPackage, motionCanvasPackage}),
+  [],
+  'dependency contract must remain aligned',
+);
+
 const motionTsconfig = JSON.parse(
   fs.readFileSync(path.join(root, 'apps/motion-canvas-studio/tsconfig.json'), 'utf8'),
 );
@@ -62,6 +72,7 @@ console.log('PASS demo timing: 10s / 300 frames');
 console.log('PASS manifest -> Remotion --props render plan');
 console.log('PASS calculateMetadata controls width/height/fps/duration');
 console.log('PASS ProductDemo consumes manifest scenes');
+console.log('PASS dependency version contract');
 console.log('PASS Motion Canvas official TypeScript base');
 console.log('PASS Motion Canvas FFmpeg exporter configured');
 console.log('PASS VS-G01 source-contract smoke gate');
