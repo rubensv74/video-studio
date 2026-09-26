@@ -1,0 +1,33 @@
+name: Render demo
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Source contract smoke test
+        run: node scripts/smoke-foundation.mjs
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate foundation
+        run: npm run check
+      - name: Render
+        run: npm run render -- projects/demo-product/project.json
+      - name: Verify rendered media
+        run: npm run verify:render -- projects/demo-product/project.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video-studio-demo
+          path: |
+            output/remotion-demo.mp4
+            package-lock.json

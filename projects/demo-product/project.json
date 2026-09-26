@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "id": "demo-product",
+  "title": "Video Studio — Product Demo",
+  "engine": "remotion",
+  "compositionId": "ProductDemo",
+  "theme": "default-dark",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "mp4",
+    "file": "output/remotion-demo.mp4"
+  },
+  "audio": {},
+  "data": {
+    "inline": {
+      "product": "Video Studio",
+      "tagline": "One contract. Multiple render engines."
+    }
+  },
+  "scenes": [
+    {
+      "id": "intro",
+      "type": "hero",
+      "durationSeconds": 3,
+      "payload": {
+        "eyebrow": "PROGRAMMATIC VIDEO PLATFORM",
+        "title": "Video Studio",
+        "subtitle": "React · Motion Canvas · FFmpeg"
+      }
+    },
+    {
+      "id": "capabilities",
+      "type": "capability-grid",
+      "durationSeconds": 5,
+      "payload": {
+        "items": ["UI demos", "Technical diagrams", "Data-driven scenes", "Audio + captions", "WebGL / 3D", "Batch rendering"]
+      }
+    },
+    {
+      "id": "outro",
+      "type": "outro",
+      "durationSeconds": 2,
+      "payload": {
+        "title": "Code is the source of truth"
+      }
+    }
+  ]
+}

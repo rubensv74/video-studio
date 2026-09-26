@@ -1,0 +1,28 @@
+{
+  "name": "video-studio",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:remotion": "npm --workspace @video-studio/remotion-studio run dev",
+    "render:remotion": "npm --workspace @video-studio/remotion-studio run render",
+    "dev:motion-canvas": "npm --workspace @video-studio/motion-canvas-studio run dev",
+    "smoke": "node scripts/smoke-foundation.mjs",
+    "verify:deps": "node scripts/verify-dependency-contract.mjs",
+    "verify:render": "node scripts/verify-render.mjs",
+    "validate:demo": "node scripts/validate-project.mjs projects/demo-product/project.json",
+    "check": "node scripts/check-env.mjs && npm run smoke && npm run typecheck",
+    "probe": "node scripts/probe-media.mjs",
+    "postprocess": "node scripts/postprocess.mjs",
+    "render": "node scripts/render.mjs",
+    "typecheck:remotion": "npm --workspace @video-studio/remotion-studio run typecheck",
+    "typecheck:motion-canvas": "npm --workspace @video-studio/motion-canvas-studio run typecheck",
+    "typecheck": "npm run typecheck:remotion && npm run typecheck:motion-canvas"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
