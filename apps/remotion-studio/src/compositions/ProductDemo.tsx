@@ -9,12 +9,12 @@ import {
   useVideoConfig,
 } from 'remotion';
 import type {VideoProjectManifest, VideoScene} from '@video-studio/contracts';
-import {videoTheme} from '@video-studio/design-system';
 import {BlueprintGrid} from '../components/BlueprintGrid';
 import {GlassCard} from '../components/GlassCard';
 import {MediaLayer} from '../components/MediaLayer';
 import {createSceneRegistry} from '../components/SceneRegistry';
 import {SceneTransition} from '../components/SceneTransition';
+import {VideoThemeProvider, useVideoTheme} from '../components/VideoThemeContext';
 
 const defaultCapabilities = [
   'UI demos',
@@ -42,22 +42,26 @@ const stringArray = (value: unknown, fallback: string[]) =>
     ? value
     : fallback;
 
-const Stage: React.FC<React.PropsWithChildren> = ({children}) => (
-  <AbsoluteFill
-    style={{
-      background:
-        'radial-gradient(circle at 72% 18%, rgba(66,199,184,.16), transparent 30%), linear-gradient(145deg, #08111F 0%, #0D1929 54%, #08111F 100%)',
-      color: videoTheme.colors.paper,
-      fontFamily: videoTheme.font.family,
-      overflow: 'hidden',
-    }}
-  >
-    <BlueprintGrid />
-    {children}
-  </AbsoluteFill>
-);
+const Stage: React.FC<React.PropsWithChildren> = ({children}) => {
+  const theme = useVideoTheme();
+
+  return (
+    <AbsoluteFill
+      style={{
+        background: `linear-gradient(145deg, ${theme.colors.ink} 0%, ${theme.colors.panel} 58%, ${theme.colors.ink} 100%)`,
+        color: theme.colors.paper,
+        fontFamily: theme.font.family,
+        overflow: 'hidden',
+      }}
+    >
+      <BlueprintGrid />
+      {children}
+    </AbsoluteFill>
+  );
+};
 
 const Intro: React.FC<{scene: VideoScene}> = ({scene}) => {
+  const theme = useVideoTheme();
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const enter = spring({frame, fps, config: {damping: 20, stiffness: 110}});
@@ -74,7 +78,7 @@ const Intro: React.FC<{scene: VideoScene}> = ({scene}) => {
           style={{
             fontSize: 24,
             letterSpacing: 7,
-            color: videoTheme.colors.accent,
+            color: theme.colors.accent,
             opacity,
           }}
         >
@@ -95,7 +99,7 @@ const Intro: React.FC<{scene: VideoScene}> = ({scene}) => {
         <div
           style={{
             fontSize: 38,
-            color: videoTheme.colors.muted,
+            color: theme.colors.muted,
             marginTop: 42,
             transform: `translateY(${y * 0.45}px)`,
             opacity: enter,
@@ -119,6 +123,7 @@ const Intro: React.FC<{scene: VideoScene}> = ({scene}) => {
 };
 
 const CapabilityGrid: React.FC<{scene: VideoScene}> = ({scene}) => {
+  const theme = useVideoTheme();
   const frame = useCurrentFrame();
   const items = stringArray(scene.payload?.items, defaultCapabilities);
 
@@ -128,7 +133,7 @@ const CapabilityGrid: React.FC<{scene: VideoScene}> = ({scene}) => {
         <div
           style={{
             fontSize: 28,
-            color: videoTheme.colors.accent,
+            color: theme.colors.accent,
             letterSpacing: 5,
           }}
         >
@@ -172,7 +177,7 @@ const CapabilityGrid: React.FC<{scene: VideoScene}> = ({scene}) => {
                   style={{
                     fontSize: 20,
                     lineHeight: 1.5,
-                    color: videoTheme.colors.muted,
+                    color: theme.colors.muted,
                     marginTop: 18,
                   }}
                 >
@@ -189,6 +194,7 @@ const CapabilityGrid: React.FC<{scene: VideoScene}> = ({scene}) => {
 };
 
 const Outro: React.FC<{scene: VideoScene}> = ({scene}) => {
+  const theme = useVideoTheme();
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
 
@@ -225,7 +231,7 @@ const Outro: React.FC<{scene: VideoScene}> = ({scene}) => {
           style={{
             fontSize: 26,
             letterSpacing: 6,
-            color: videoTheme.colors.accent,
+            color: theme.colors.accent,
           }}
         >
           VIDEO STUDIO
@@ -238,7 +244,10 @@ const Outro: React.FC<{scene: VideoScene}> = ({scene}) => {
   );
 };
 
-const GenericScene: React.FC<{scene: VideoScene}> = ({scene}) => (
+const GenericScene: React.FC<{scene: VideoScene}> = ({scene}) => {
+  const theme = useVideoTheme();
+
+  return (
   <Stage>
     <AbsoluteFill
       style={{alignItems: 'center', justifyContent: 'center', zIndex: 1}}
@@ -247,7 +256,7 @@ const GenericScene: React.FC<{scene: VideoScene}> = ({scene}) => (
         style={{
           fontSize: 26,
           letterSpacing: 5,
-          color: videoTheme.colors.accent,
+          color: theme.colors.accent,
         }}
       >
         {scene.type.toUpperCase()}
@@ -257,7 +266,8 @@ const GenericScene: React.FC<{scene: VideoScene}> = ({scene}) => (
       </div>
     </AbsoluteFill>
   </Stage>
-);
+  );
+};
 
 const SceneRenderer = createSceneRegistry(
   {
@@ -272,7 +282,8 @@ export const ProductDemo: React.FC<VideoProjectManifest> = (project) => {
   let from = 0;
 
   return (
-    <AbsoluteFill>
+    <VideoThemeProvider themeId={project.theme}>
+      <AbsoluteFill>
       {project.scenes.map((scene) => {
         const durationInFrames = Math.max(
           1,
@@ -294,6 +305,7 @@ export const ProductDemo: React.FC<VideoProjectManifest> = (project) => {
         );
       })}
       <MediaLayer media={project.media} />
-    </AbsoluteFill>
+      </AbsoluteFill>
+    </VideoThemeProvider>
   );
 };
