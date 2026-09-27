@@ -4,6 +4,7 @@ import {
   createExternalOperationalStore,
   createExternalWorkerRuntime,
 } from './external-runtime-adapter.mjs';
+import {createSupabaseOperationalStore} from './supabase-operational-store.mjs';
 
 const required = (env, key) => {
   const value = String(env[key] ?? '').trim();
@@ -37,11 +38,9 @@ export const createRuntimeBindingsFromEnv = ({
     env,
     'VIDEO_STUDIO_WORKER_CREDENTIAL_REF',
   );
-  const storeUrl = required(env, 'VIDEO_STUDIO_STORE_URL');
-  const storeCredentialRef = required(
-    env,
-    'VIDEO_STUDIO_STORE_CREDENTIAL_REF',
-  );
+  const storeProvider = String(
+    env.VIDEO_STUDIO_STORE_PROVIDER ?? 'http',
+  ).trim().toLowerCase();
 
   const workerRuntime = createExternalWorkerRuntime({
     baseUrl: workerUrl,
@@ -50,12 +49,30 @@ export const createRuntimeBindingsFromEnv = ({
     fetchImpl,
   });
 
-  const operationalStore = createExternalOperationalStore({
-    baseUrl: storeUrl,
-    credentialRef: storeCredentialRef,
-    secretResolver,
-    fetchImpl,
-  });
+  let operationalStore;
+
+  if (storeProvider === 'supabase') {
+    operationalStore = createSupabaseOperationalStore({
+      baseUrl: required(env, 'VIDEO_STUDIO_SUPABASE_URL'),
+      secretRef: required(env, 'VIDEO_STUDIO_SUPABASE_SECRET_REF'),
+      schema: String(
+        env.VIDEO_STUDIO_SUPABASE_SCHEMA ?? 'video_studio_api',
+      ).trim(),
+      secretResolver,
+      fetchImpl,
+    });
+  } else if (storeProvider === 'http') {
+    operationalStore = createExternalOperationalStore({
+      baseUrl: required(env, 'VIDEO_STUDIO_STORE_URL'),
+      credentialRef: required(env, 'VIDEO_STUDIO_STORE_CREDENTIAL_REF'),
+      secretResolver,
+      fetchImpl,
+    });
+  } else {
+    throw new Error(
+      `Unsupported VIDEO_STUDIO_STORE_PROVIDER: ${storeProvider}. Expected http or supabase.`,
+    );
+  }
 
   return {
     runtimeProfile,
@@ -64,7 +81,10 @@ export const createRuntimeBindingsFromEnv = ({
     runtimeSummary: {
       profile: runtimeProfile.id,
       worker: 'external-http-worker',
-      store: 'external-http-store',
+      store:
+        operationalStore.type === 'supabase-operational-store'
+          ? 'supabase-operational-store'
+          : 'external-http-store',
     },
   };
 };
