@@ -8,6 +8,7 @@ import {
   createExternalWorkerRuntime,
   createRuntimeDiagnostics,
 } from './lib/external-runtime-adapter.mjs';
+import {createControlPlaneService} from './lib/control-plane-service.mjs';
 
 assert.equal(getRuntimeProfile({env: {VIDEO_STUDIO_PROFILE: 'local'}}).id, 'local');
 assert.equal(getRuntimeProfile({env: {VIDEO_STUDIO_PROFILE: 'ci'}}).id, 'ci');
@@ -270,8 +271,11 @@ try {
   assert.equal(snapshot.audit.length, 1);
   console.log('PASS external operational-store adapter contract');
 
+  const productionProfile = getRuntimeProfile({
+    env: {VIDEO_STUDIO_PROFILE: 'production'},
+  });
   const diagnostics = createRuntimeDiagnostics({
-    profile: getRuntimeProfile({env: {VIDEO_STUDIO_PROFILE: 'production'}}),
+    profile: productionProfile,
     workerRuntime: worker,
     operationalStore: store,
   });
@@ -283,6 +287,55 @@ try {
   assert.equal(JSON.stringify(observed).includes('runtime-worker-token'), false);
   assert.equal(JSON.stringify(observed).includes('runtime-store-token'), false);
   console.log('PASS provider runtime diagnostics without secret leakage');
+
+  const controlPlane = createControlPlaneService({
+    operationalStore: store,
+    workerRuntime: worker,
+    runtimeProfile: productionProfile,
+    runtimeDiagnosticsProvider: diagnostics,
+  });
+  const controlServer = http.createServer(controlPlane.handler);
+  await new Promise((resolve) => controlServer.listen(0, '127.0.0.1', resolve));
+
+  try {
+    const controlAddress = controlServer.address();
+    assert.ok(controlAddress && typeof controlAddress === 'object');
+    const controlOrigin = `http://127.0.0.1:${controlAddress.port}`;
+
+    const runtimeResponse = await fetch(`${controlOrigin}/api/runtime`);
+    assert.equal(runtimeResponse.status, 200);
+    const runtimeBody = await runtimeResponse.json();
+    assert.equal(runtimeBody.profile, 'production');
+    assert.equal(runtimeBody.services.worker.status, 'available');
+    assert.equal(runtimeBody.services.store.status, 'available');
+    assert.equal(JSON.stringify(runtimeBody).includes('runtime-worker-token'), false);
+    console.log('PASS Control Plane runtime diagnostics endpoint');
+
+    const renderResponse = await fetch(`${controlOrigin}/api/renders`, {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
+        kind: 'project',
+        path: 'projects/demo-product/project.json',
+        dryRun: false,
+      }),
+    });
+    assert.equal(renderResponse.status, 202);
+    const renderBody = await renderResponse.json();
+    assert.equal(renderBody.delegated, true);
+    assert.ok(String(renderBody.providerRunId).startsWith('remote-'));
+    assert.ok(
+      [...state.runs.values()].some(
+        (run) => run.id === renderBody.runId && run.worker === 'external-http-worker',
+      ),
+    );
+    console.log('PASS Control Plane delegates render to external worker');
+    console.log('PASS external operational store receives delegated run state');
+  } finally {
+    await new Promise((resolve, reject) =>
+      controlServer.close((error) => (error ? reject(error) : resolve())),
+    );
+  }
 } finally {
   await new Promise((resolve, reject) =>
     providerServer.close((error) => (error ? reject(error) : resolve())),
