@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {fileURLToPath} from 'node:url';
 import {
   loadProjectManifest,
   validateProject,
@@ -15,6 +14,13 @@ import {
   loadThemeCatalog,
   writeProject,
 } from './scaffold.mjs';
+import {createJsonControlPlaneStore} from './control-plane-store.mjs';
+import {
+  authenticate,
+  ControlPlaneHttpError,
+  normalizeApiKeys,
+  requestFingerprint,
+} from './control-plane-auth.mjs';
 
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -41,10 +47,15 @@ const readBody = async (request) => {
   for await (const chunk of request) {
     body += chunk;
     if (body.length > 1_000_000) {
-      throw new Error('Request body exceeds 1 MB');
+      throw new ControlPlaneHttpError(413, 'Request body exceeds 1 MB');
     }
   }
-  return body ? JSON.parse(body) : {};
+
+  try {
+    return body ? JSON.parse(body) : {};
+  } catch {
+    throw new ControlPlaneHttpError(400, 'Request body must be valid JSON');
+  }
 };
 
 const isInside = (parent, child) => {
@@ -54,13 +65,16 @@ const isInside = (parent, child) => {
 
 const safeJsonPath = ({root, requested, allowedRoots}) => {
   if (typeof requested !== 'string' || !requested.endsWith('.json')) {
-    throw new Error('Only .json targets are allowed');
+    throw new ControlPlaneHttpError(400, 'Only .json targets are allowed');
   }
 
   const target = path.resolve(root, requested);
   const allowed = allowedRoots.map((item) => path.resolve(root, item));
   if (!allowed.some((base) => isInside(base, target))) {
-    throw new Error('Target path is outside the allowed repository scope');
+    throw new ControlPlaneHttpError(
+      400,
+      'Target path is outside the allowed repository scope',
+    );
   }
   return target;
 };
@@ -91,12 +105,36 @@ export const createControlPlaneService = ({
   root = process.cwd(),
   projectRoot = 'projects',
   distDir = 'apps/control-plane/dist',
+  stateFile = '.video-studio/control-plane-state.json',
+  authDisabled = false,
+  apiKeys = {},
+  store,
+  spawnImpl = spawn,
 } = {}) => {
   const absoluteRoot = path.resolve(root);
   const absoluteProjectRoot = path.resolve(absoluteRoot, projectRoot);
   const absoluteDist = path.resolve(absoluteRoot, distDir);
-  const liveRuns = new Map();
+  const stateStore =
+    store ??
+    createJsonControlPlaneStore({
+      file: path.resolve(absoluteRoot, stateFile),
+    });
+  const credentials = normalizeApiKeys(apiKeys);
   let runCounter = 0;
+
+  if (!authDisabled && credentials.size === 0) {
+    throw new Error(
+      'Control Plane authentication is enabled but VIDEO_STUDIO_API_KEYS is empty. Configure API keys or explicitly set VIDEO_STUDIO_AUTH_DISABLED=true for local development.',
+    );
+  }
+
+  const actorFor = (request, requiredRole = 'viewer') =>
+    authenticate({
+      request,
+      authDisabled,
+      credentials,
+      requiredRole,
+    });
 
   const catalog = () => {
     const projects = listProjectFiles(absoluteProjectRoot).flatMap((file) => {
@@ -166,8 +204,8 @@ export const createControlPlaneService = ({
       });
 
   const runs = () => {
-    const live = [...liveRuns.values()];
-    return [...live, ...reportRuns()].sort((a, b) =>
+    const persisted = stateStore.getRuns();
+    return [...persisted, ...reportRuns()].sort((a, b) =>
       String(b.startedAt ?? b.completedAt ?? '').localeCompare(
         String(a.startedAt ?? a.completedAt ?? ''),
       ),
@@ -181,10 +219,12 @@ export const createControlPlaneService = ({
         requested,
         allowedRoots: [projectRoot],
       });
-      if (!fs.existsSync(file)) throw new Error('Project manifest does not exist');
+      if (!fs.existsSync(file)) {
+        throw new ControlPlaneHttpError(400, 'Project manifest does not exist');
+      }
       const {project} = loadProjectManifest(file);
       const errors = validateProject(project);
-      if (errors.length) throw new Error(errors.join('; '));
+      if (errors.length) throw new ControlPlaneHttpError(400, errors.join('; '));
       return file;
     }
 
@@ -194,17 +234,19 @@ export const createControlPlaneService = ({
         requested,
         allowedRoots: ['batches'],
       });
-      if (!fs.existsSync(file)) throw new Error('Batch file does not exist');
+      if (!fs.existsSync(file)) {
+        throw new ControlPlaneHttpError(400, 'Batch file does not exist');
+      }
       const {batch} = loadBatch(file);
       const errors = validateBatch(batch);
-      if (errors.length) throw new Error(errors.join('; '));
+      if (errors.length) throw new ControlPlaneHttpError(400, errors.join('; '));
       return file;
     }
 
-    throw new Error('kind must be project or batch');
+    throw new ControlPlaneHttpError(400, 'kind must be project or batch');
   };
 
-  const startRun = ({kind, target}) => {
+  const startRun = ({kind, target, actor}) => {
     const id = `run-${Date.now()}-${++runCounter}`;
     const script = kind === 'batch' ? 'scripts/render-batch.mjs' : 'scripts/render.mjs';
     const startedAt = new Date().toISOString();
@@ -216,17 +258,26 @@ export const createControlPlaneService = ({
       status: 'running',
       startedAt,
       exitCode: null,
+      requestedBy: actor.subject,
     };
-    liveRuns.set(id, record);
+    stateStore.upsertRun(record);
+    stateStore.appendAudit({
+      actor: actor.subject,
+      role: actor.role,
+      action: 'render.submit',
+      target: record.target,
+      status: 'accepted',
+      detail: {runId: id, kind},
+    });
 
-    const child = spawn(process.execPath, [script, target], {
+    const child = spawnImpl(process.execPath, [script, target], {
       cwd: absoluteRoot,
       stdio: 'inherit',
       shell: false,
     });
 
     child.on('error', (error) => {
-      liveRuns.set(id, {
+      stateStore.upsertRun({
         ...record,
         status: 'failed',
         completedAt: new Date().toISOString(),
@@ -236,7 +287,7 @@ export const createControlPlaneService = ({
     });
 
     child.on('exit', (code) => {
-      liveRuns.set(id, {
+      stateStore.upsertRun({
         ...record,
         status: code === 0 ? 'success' : 'failed',
         completedAt: new Date().toISOString(),
@@ -245,6 +296,52 @@ export const createControlPlaneService = ({
     });
 
     return {id};
+  };
+
+  const idempotentMutation = async ({
+    request,
+    url,
+    actor,
+    body,
+    operation,
+  }) => {
+    const key = request.headers['idempotency-key'];
+    if (typeof key !== 'string' || key.trim().length < 8) {
+      throw new ControlPlaneHttpError(
+        400,
+        'Mutating requests require an Idempotency-Key header of at least 8 characters',
+      );
+    }
+
+    const fingerprint = requestFingerprint({
+      method: request.method,
+      pathname: url.pathname,
+      body,
+    });
+    const scope = actor.subject;
+    const existing = stateStore.getIdempotency(scope, key);
+
+    if (existing) {
+      if (existing.fingerprint !== fingerprint) {
+        throw new ControlPlaneHttpError(
+          409,
+          'Idempotency-Key was already used with a different request',
+        );
+      }
+      return {
+        status: existing.status,
+        body: {...existing.body, idempotentReplay: true},
+      };
+    }
+
+    const result = await operation();
+    stateStore.putIdempotency(scope, key, {
+      fingerprint,
+      status: result.status,
+      body: result.body,
+      createdAt: new Date().toISOString(),
+    });
+    return result;
   };
 
   const serveStatic = (request, response) => {
@@ -284,13 +381,20 @@ export const createControlPlaneService = ({
         json(response, 200, {
           status: 'ok',
           service: 'video-studio-control-plane',
-          version: 1,
+          version: 2,
+          auth: {
+            enabled: !authDisabled,
+            roles: ['viewer', 'operator', 'admin'],
+          },
           capabilities: [
             'catalog',
             'project-scaffolding',
             'render-submission',
             'batch-submission',
-            'run-history',
+            'persistent-run-history',
+            'audit-log',
+            'idempotency',
+            'rbac',
             'cache-aware-scale-layer',
           ],
         });
@@ -298,36 +402,69 @@ export const createControlPlaneService = ({
       }
 
       if (request.method === 'GET' && url.pathname === '/api/catalog') {
+        actorFor(request, 'viewer');
         json(response, 200, catalog());
         return;
       }
 
       if (request.method === 'GET' && url.pathname === '/api/runs') {
+        actorFor(request, 'viewer');
         json(response, 200, {runs: runs()});
         return;
       }
 
+      if (request.method === 'GET' && url.pathname === '/api/audit') {
+        actorFor(request, 'admin');
+        const limit = Number(url.searchParams.get('limit') ?? 200);
+        json(response, 200, {events: stateStore.getAudit({limit})});
+        return;
+      }
+
       if (request.method === 'POST' && url.pathname === '/api/projects') {
+        const actor = actorFor(request, 'operator');
         const body = await readBody(request);
-        const result = writeProject({
-          id: body.id,
-          title: body.title,
-          preset: body.preset,
-          theme: body.theme,
-          outputRoot: absoluteProjectRoot,
-          force: false,
-        });
-        json(response, 201, {
-          status: 'created',
-          project: {
-            id: result.manifest.id,
-            path: relativePosix(absoluteRoot, result.projectFile),
+        const result = await idempotentMutation({
+          request,
+          url,
+          actor,
+          body,
+          operation: async () => {
+            const created = writeProject({
+              id: body.id,
+              title: body.title,
+              preset: body.preset,
+              theme: body.theme,
+              outputRoot: absoluteProjectRoot,
+              force: false,
+            });
+            const responseBody = {
+              status: 'created',
+              project: {
+                id: created.manifest.id,
+                path: relativePosix(absoluteRoot, created.projectFile),
+              },
+            };
+            stateStore.appendAudit({
+              actor: actor.subject,
+              role: actor.role,
+              action: 'project.create',
+              target: responseBody.project.path,
+              status: 'created',
+              detail: {
+                projectId: created.manifest.id,
+                preset: body.preset,
+                theme: body.theme,
+              },
+            });
+            return {status: 201, body: responseBody};
           },
         });
+        json(response, result.status, result.body);
         return;
       }
 
       if (request.method === 'POST' && url.pathname === '/api/renders') {
+        const actor = actorFor(request, 'operator');
         const body = await readBody(request);
         const target = validateRenderTarget({
           kind: body.kind,
@@ -343,8 +480,20 @@ export const createControlPlaneService = ({
           return;
         }
 
-        const run = startRun({kind: body.kind, target});
-        json(response, 202, {status: 'accepted', runId: run.id});
+        const result = await idempotentMutation({
+          request,
+          url,
+          actor,
+          body,
+          operation: async () => {
+            const run = startRun({kind: body.kind, target, actor});
+            return {
+              status: 202,
+              body: {status: 'accepted', runId: run.id},
+            };
+          },
+        });
+        json(response, result.status, result.body);
         return;
       }
 
@@ -355,7 +504,7 @@ export const createControlPlaneService = ({
 
       serveStatic(request, response);
     } catch (error) {
-      json(response, 400, {
+      json(response, error?.status ?? 400, {
         error: error instanceof Error ? error.message : String(error),
       });
     }
@@ -366,7 +515,6 @@ export const createControlPlaneService = ({
     catalog,
     runs,
     validateRenderTarget,
+    store: stateStore,
   };
 };
-
-export const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));

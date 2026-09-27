@@ -2,6 +2,10 @@ export type HealthResponse = {
   status: 'ok';
   service: string;
   version: number;
+  auth: {
+    enabled: boolean;
+    roles: string[];
+  };
   capabilities: string[];
 };
 
@@ -54,6 +58,7 @@ export type RunSummary = {
   kind: 'project' | 'batch' | 'report';
   target: string;
   status: string;
+  requestedBy?: string;
   startedAt?: string;
   completedAt?: string;
   exitCode?: number | null;

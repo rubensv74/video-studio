@@ -11,3 +11,4 @@ apps/**/output/
 apps/remotion-studio/public/fixtures/
 
 .generated/
+.video-studio/

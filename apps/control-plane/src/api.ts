@@ -4,6 +4,13 @@ import type {
   RunsResponse,
 } from './types';
 
+const storageKey = 'video-studio-control-plane-api-key';
+
+let apiKey =
+  typeof window === 'undefined'
+    ? ''
+    : window.sessionStorage.getItem(storageKey) ?? '';
+
 const request = async <T>(
   url: string,
   options?: RequestInit,
@@ -12,6 +19,7 @@ const request = async <T>(
     ...options,
     headers: {
       'content-type': 'application/json',
+      ...(apiKey ? {authorization: `Bearer ${apiKey}`} : {}),
       ...(options?.headers ?? {}),
     },
   });
@@ -27,7 +35,19 @@ const request = async <T>(
   return body as T;
 };
 
+const mutationHeaders = () => ({
+  'idempotency-key': crypto.randomUUID(),
+});
+
 export const controlPlaneApi = {
+  getApiKey: () => apiKey,
+  setApiKey: (value: string) => {
+    apiKey = value.trim();
+    if (typeof window !== 'undefined') {
+      if (apiKey) window.sessionStorage.setItem(storageKey, apiKey);
+      else window.sessionStorage.removeItem(storageKey);
+    }
+  },
   health: () => request<HealthResponse>('/api/health'),
   catalog: () => request<CatalogResponse>('/api/catalog'),
   runs: () => request<RunsResponse>('/api/runs'),
@@ -41,12 +61,14 @@ export const controlPlaneApi = {
       '/api/projects',
       {
         method: 'POST',
+        headers: mutationHeaders(),
         body: JSON.stringify(payload),
       },
     ),
   submitBatch: (path: string) =>
     request<{status: string; runId: string}>('/api/renders', {
       method: 'POST',
+      headers: mutationHeaders(),
       body: JSON.stringify({kind: 'batch', path, dryRun: false}),
     }),
 };
