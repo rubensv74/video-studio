@@ -20,11 +20,17 @@ services:
       - key: VIDEO_STUDIO_SUPABASE_SECRET_KEY
         sync: false
       - key: VIDEO_STUDIO_WORKER_URL
-        sync: false
+        fromService:
+          type: web
+          name: video-studio-worker
+          envVarKey: RENDER_EXTERNAL_URL
       - key: VIDEO_STUDIO_WORKER_CREDENTIAL_REF
         value: env:VIDEO_STUDIO_WORKER_TOKEN
       - key: VIDEO_STUDIO_WORKER_TOKEN
-        sync: false
+        fromService:
+          type: web
+          name: video-studio-worker
+          envVarKey: VIDEO_STUDIO_WORKER_TOKEN
       - key: VIDEO_STUDIO_ALLOWED_ORIGINS
         sync: false
 
@@ -36,4 +42,4 @@ services:
     healthCheckPath: /health
     envVars:
       - key: VIDEO_STUDIO_WORKER_TOKEN
-        sync: false
+        generateValue: true
