@@ -1,21 +1,14 @@
 # Runner diagnostic — CI-G01
 
-## Purpose
+## Status
 
-This document records the evidence for the GitHub Actions runner-allocation blocker affecting VS-G02.
+**RESOLVED**
 
-The goal is to distinguish:
+The repository was changed from private to public. After that change, GitHub-hosted standard runners were allocated successfully without relying on the exhausted private-repository Actions allowance.
 
-- a project/workflow defect;
-- an operating-system runner-image defect;
-- a GitHub platform incident;
-- a repository/account-level restriction.
+## Original symptom
 
-## Evidence
-
-The normal `Render demo` workflow repeatedly triggers but terminates before any step begins.
-
-Observed job state:
+While the repository was private, the normal `Render demo` workflow repeatedly terminated before any step began:
 
 ```text
 runner_id = 0
@@ -24,78 +17,39 @@ steps = []
 conclusion = failure
 ```
 
-Because `actions/checkout` never starts, these failures cannot be attributed to:
+The account had:
 
-- npm;
-- TypeScript;
-- FFmpeg;
-- Remotion;
-- Motion Canvas;
-- repository source code.
-
-## Cross-platform control test
-
-PR #3 adds `.github/workflows/runner-diagnostic.yml`.
-
-It runs two deliberately minimal jobs:
-
-- `ubuntu-latest`;
-- `windows-latest`.
-
-Both jobs fail before runner allocation with the same signature:
-
-```text
-runner_id = 0
-runner_name = ""
-steps = []
-```
-
-This rules out an Ubuntu-specific image problem.
-
-## Platform-status control
-
-At the time of this investigation, GitHub's public status summary reports GitHub Actions as operational.
-
-That does not prove the user account is correctly configured. It does reduce the likelihood that this repository is merely observing a platform-wide Actions outage.
-
-## Most likely remaining boundary
-
-The unresolved boundary is repository/account-level eligibility for hosted runners.
-
-Check in the GitHub UI:
-
-1. Repository → **Settings**.
-2. **Actions → General**.
-3. Confirm Actions are enabled for the repository.
-4. Confirm the repository may use GitHub-hosted runners/actions required by the workflow.
-5. Account → **Settings → Billing and licensing / Billing**.
-6. Review Actions usage, included minutes, budgets/spending limits, payment restrictions and any account-level usage block.
-7. If an organization owns the repository in the future, also review organization Actions policies and runner policies.
-
-Do not treat any of these as the root cause until the UI shows evidence.
+- 2,000 / 2,000 included private-repository Actions minutes consumed;
+- Actions budget = $0;
+- Stop usage = Yes.
 
 ## Recovery proof
 
-The blocker is considered resolved only when a diagnostic job shows:
+After the repository became public, the same diagnostic was rerun without changing the job commands.
 
-```text
-runner_id > 0
-steps.length > 0
-```
+Both hosted runners were allocated and completed successfully:
 
-The first step must actually start.
+- `ubuntu-latest` -> PASS;
+- `windows-latest` -> PASS.
 
-After that, rerun the VS-G02 render workflow and continue with the next real failure, if any.
+The render workflow then also received a hosted Ubuntu runner and progressed through checkout, dependency installation, TypeScript validation and physical rendering.
 
-## VS-G02 remains stricter
+## Operational decision
 
-Restoring runner allocation alone does not close VS-G02.
+`runner-diagnostic.yml` remains available only through `workflow_dispatch`.
 
-VS-G02 requires:
+It no longer runs on every pull request because runner availability has been proven and there is no value in consuming duplicate CI capacity.
 
-1. `npm install`;
-2. generated `package-lock.json`;
-3. `npm run check`;
-4. physical Remotion H.264 render;
-5. `npm run verify:render -- projects/demo-product/project.json`;
-6. workflow artifacts containing the real MP4 and lockfile.
+## Public-repository operating model
+
+Video Studio now uses standard GitHub-hosted runners for its public repository CI path.
+
+The project should still keep:
+
+- deterministic dependency pins;
+- a committed lockfile;
+- strict source-contract validation;
+- strict rendered-media verification;
+- artifacts for reference renders.
+
+Runner availability is no longer part of the VS-G02 blocker.
