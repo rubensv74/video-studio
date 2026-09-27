@@ -21,7 +21,7 @@ for (const scene of project.scenes) {
   const output = path.join(outputDir, `${scene.id}.png`);
   const result = spawnSync(
     'ffmpeg',
-    ['-y', '-ss', String(midpoint), '-i', mediaFile, '-frames:v', '1', output],
+    ['-y', '-ss', String(midpoint), '-i', mediaFile, '-frames:v', '1', '-update', '1', output],
     {stdio: 'inherit'},
   );
   if (result.status !== 0) process.exit(result.status ?? 1);
