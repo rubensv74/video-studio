@@ -29,6 +29,11 @@ This avoids coupling a video project to a single engine.
 - Numbered PNG image sequences
 - Configurable FFmpeg loudness normalization
 - Scene-level QA still extraction
+- Project scaffolding from presets
+- 16:9, 9:16 and 1:1 physical render presets
+- Runtime theme packs
+- Reusable scene registry and transitions
+- Inline, local JSON and HTTP JSON data adapters
 - CI-ready headless rendering
 - Multi-engine source architecture
 
@@ -55,6 +60,39 @@ Linux/macOS:
 ```
 
 The bootstrap generates deterministic technical media fixtures, performs `npm ci`, type-checks both engines, renders the primary MP4, generates derivatives and verifies the media stack.
+
+## Create a new project
+
+A project can now be scaffolded without manually writing `project.json`.
+
+```bash
+npm run create:project -- \
+  --id my-video \
+  --title "My Video" \
+  --preset portrait-9x16 \
+  --theme blueprint-cyan
+```
+
+Available presets:
+
+- `landscape-16x9` — 1920x1080
+- `portrait-9x16` — 1080x1920
+- `square-1x1` — 1080x1080
+
+Available verified themes:
+
+- `default-dark`
+- `blueprint-cyan`
+
+Productization checks:
+
+```bash
+npm run test:productization
+npm run render:productization
+npm run verify:runtime-theme -- .generated/productization/generated-portrait-9x16/project.json
+```
+
+## Rendering
 
 Manual media-stack path:
 
@@ -101,12 +139,15 @@ A manifest can define:
 
 - primary output;
 - semantic scenes;
+- theme;
 - audio tracks by role;
 - video tracks;
 - captions;
 - derivative outputs;
 - loudness-normalization policy;
-- data inputs.
+- inline data;
+- local JSON data;
+- HTTP JSON endpoints.
 
 The manifest remains the anti-lock-in boundary: render-engine code maps this neutral intent to Remotion, Motion Canvas or FFmpeg.
 
@@ -116,10 +157,12 @@ The manifest remains the anti-lock-in boundary: render-engine code maps this neu
 - **VS-G02 — First Verified Render:** VERIFIED
 - **VS-G03 — Media Stack:** VERIFIED
 - **VS-G04 — Advanced Visuals:** VERIFIED
-- **VS-G05 — Productization:** NEXT
+- **VS-G05 — Productization:** VERIFIED
+- **VS-G06 — Scale:** NEXT
 
 Reference evidence:
 
 - `docs/vs-g02-evidence.md`
 - `docs/vs-g03-evidence.md`
 - `docs/vs-g04-evidence.md`
+- `docs/vs-g05-evidence.md`

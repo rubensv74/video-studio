@@ -49,68 +49,70 @@ See `docs/vs-g03-evidence.md`.
 
 ## VS-G04 — Advanced visuals
 
-**Status: VERIFIED — PR #9**
+**Status: VERIFIED — merged through PR #9**
 
-### Physical rendering paths
+Verified:
 
-The independent `advanced-visuals-demo` composition proves three advanced paths in one H.264 render:
-
-1. animated SVG system-flow scene;
-2. deterministic HTML Canvas telemetry scene;
-3. Three.js / React Three Fiber / WebGL industrial-asset scene.
-
-The project remains manifest-driven through:
-
-```text
-projects/advanced-visuals-demo/project.json
-```
-
-### Specialist Motion Canvas path
-
-The Motion Canvas workspace remains inside the normal TypeScript gate and continues to provide the specialist authoring path for engineering diagrams. It is intentionally not required for CI-critical headless video rendering.
-
-### Verified media contract
-
-Reference run `36304477408` produced:
-
-- H.264 High profile;
-- 1920x1080;
-- 30 FPS;
-- 9.00 s duration;
-- physical render from Remotion 4.0.528.
-
-### Scene QA evidence
-
-CI extracts one midpoint PNG from each scene and verifies PNG codec, 1920x1080 geometry and non-trivial file size.
-
-Reference QA sizes:
-
-- `svg-flow.png`: 428,767 bytes;
-- `canvas-telemetry.png`: 732,439 bytes;
-- `three-asset.png`: 358,239 bytes.
-
-Artifact:
-
-- ID: `10926876837`;
-- size: `7,846,606 bytes`;
-- digest: `sha256:c2ddbf50401407f6128519a3a977bcb69805f3e7863cf376a3b45efcfd7786b0`.
+- animated SVG;
+- deterministic HTML Canvas;
+- Three.js / React Three Fiber / WebGL;
+- specialist Motion Canvas TypeScript path;
+- physical H.264 advanced-visual render;
+- scene-level PNG QA evidence.
 
 See `docs/vs-g04-evidence.md`.
 
 ## VS-G05 — Productization
 
+**Status: VERIFIED — merged through PR #11**
+
+Verified:
+
+- project scaffolder CLI;
+- manifest validation for generated projects;
+- physical 16:9 render;
+- physical 9:16 render;
+- physical 1:1 render;
+- `default-dark` and `blueprint-cyan` theme packs;
+- runtime theme application;
+- physical theme-pixel verification;
+- reusable scene registry;
+- reusable transition primitive used in physical renders;
+- inline + local JSON data adapter;
+- HTTP JSON API adapter;
+- deterministic local API test;
+- CI artifact retention for generated projects.
+
+Reference run: `36309618945`.
+
+Theme evidence:
+
+```text
+PASS runtime theme: blueprint-cyan
+PASS expected accent: rgb(0,200,255)
+PASS sampled accent: rgb(0,202,255)
+```
+
+Artifact:
+
+- ID: `10928189933`;
+- size: `14,797,687 bytes`;
+- digest: `sha256:080e83ae68de91c0b75f5882fea773c56488ff19f4cca3c8d7d2f606a165770f`.
+
+See `docs/vs-g05-evidence.md`.
+
+## VS-G06 — Scale
+
 **Status: NEXT**
 
 Add and verify:
 
-- reusable project templates;
-- brand/theme packs;
-- reusable motion-component registry;
-- project scaffolder;
-- data/API adapters;
-- manifest presets for 16:9 / 9:16 / 1:1;
-- stronger transition primitives.
-
-## VS-G06 — Scale
-
-Add batch rendering, render queues, caching, cloud workers and artifact retention without changing the project manifest contract.
+- manifest-driven batch rendering;
+- render queue contract;
+- deterministic cache keys;
+- cache-aware render execution;
+- controlled concurrency;
+- artifact-retention metadata;
+- cloud-worker adapter boundary;
+- batch summary/reporting;
+- regression-proof operation without changing the neutral project manifest.
