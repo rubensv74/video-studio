@@ -9,6 +9,7 @@ import {
   createRuntimeDiagnostics,
 } from './lib/external-runtime-adapter.mjs';
 import {createControlPlaneService} from './lib/control-plane-service.mjs';
+import {createRuntimeBindingsFromEnv} from './lib/runtime-bootstrap.mjs';
 
 assert.equal(getRuntimeProfile({env: {VIDEO_STUDIO_PROFILE: 'local'}}).id, 'local');
 assert.equal(getRuntimeProfile({env: {VIDEO_STUDIO_PROFILE: 'ci'}}).id, 'ci');
@@ -22,6 +23,46 @@ assert.throws(
 );
 assert.equal(listRuntimeProfiles().length, 3);
 console.log('PASS local/ci/production deployment profiles');
+
+const localBindings = createRuntimeBindingsFromEnv({
+  env: {VIDEO_STUDIO_PROFILE: 'local'},
+});
+assert.equal(localBindings.runtimeProfile.id, 'local');
+assert.equal(localBindings.workerRuntime, undefined);
+assert.equal(localBindings.operationalStore, undefined);
+
+assert.throws(
+  () =>
+    createRuntimeBindingsFromEnv({
+      env: {VIDEO_STUDIO_PROFILE: 'production'},
+    }),
+  /VIDEO_STUDIO_WORKER_URL is required/,
+);
+
+const productionBindings = createRuntimeBindingsFromEnv({
+  env: {
+    VIDEO_STUDIO_PROFILE: 'production',
+    VIDEO_STUDIO_WORKER_URL: 'https://worker.example.test',
+    VIDEO_STUDIO_WORKER_CREDENTIAL_REF: 'env:WORKER_TOKEN',
+    VIDEO_STUDIO_STORE_URL: 'https://store.example.test',
+    VIDEO_STUDIO_STORE_CREDENTIAL_REF: 'secret:store/token',
+  },
+  fetchImpl: async () => {
+    throw new Error('not called by bootstrap contract test');
+  },
+  secretProvider: {
+    resolve: async () => 'not-called',
+  },
+});
+assert.equal(productionBindings.runtimeProfile.id, 'production');
+assert.equal(productionBindings.workerRuntime.type, 'external-http-worker');
+assert.equal(productionBindings.operationalStore.type, 'external-http-store');
+assert.deepEqual(productionBindings.runtimeSummary, {
+  profile: 'production',
+  worker: 'external-http-worker',
+  store: 'external-http-store',
+});
+console.log('PASS environment-driven runtime bootstrap and production fail-fast');
 
 const secretResolver = createSecretResolver({
   env: {WORKER_TOKEN: 'runtime-worker-token'},
