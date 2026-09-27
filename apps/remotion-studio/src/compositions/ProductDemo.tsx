@@ -55,6 +55,18 @@ const Stage: React.FC<React.PropsWithChildren> = ({children}) => {
       }}
     >
       <BlueprintGrid />
+      <div
+        data-video-theme-accent
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 12,
+          background: theme.colors.accent,
+          zIndex: 200,
+        }}
+      />
       {children}
     </AbsoluteFill>
   );
