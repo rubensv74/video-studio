@@ -11,6 +11,7 @@ export const verifyDependencyContract = ({remotionPackage, motionCanvasPackage})
 
   const remotionVersion = get(remotionPackage.dependencies, 'remotion');
   const remotionPackages = [
+    '@remotion/captions',
     '@remotion/cli',
     '@remotion/media',
     '@remotion/player',
@@ -29,7 +30,6 @@ export const verifyDependencyContract = ({remotionPackage, motionCanvasPackage})
     );
   }
 
-  // Baseline copied from Remotion's official template-three at tag v4.0.528.
   exact('remotion', remotionVersion, '4.0.528');
   exact('react', get(remotionPackage.dependencies, 'react'), '19.2.3');
   exact('react-dom', get(remotionPackage.dependencies, 'react-dom'), '19.2.3');

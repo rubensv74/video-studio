@@ -23,11 +23,18 @@ jobs:
         run: node scripts/smoke-foundation.mjs
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Generate deterministic media fixtures
+        run: node scripts/generate-media-fixtures.mjs
       - name: Install dependencies
         shell: bash
         run: |
           if [ -f package-lock.json ]; then
-            npm ci --no-audit --no-fund
+            if npm ci --no-audit --no-fund; then
+              echo "Lockfile installation succeeded"
+            else
+              echo "Lockfile is stale for this branch; resolving the new dependency graph"
+              npm install --no-audit --no-fund
+            fi
           else
             npm install --no-audit --no-fund
           fi
@@ -53,13 +60,20 @@ jobs:
           git push origin "HEAD:${GITHUB_HEAD_REF}"
       - name: Validate foundation
         run: npm run check
-      - name: Render
+      - name: Render primary
         run: npm run render -- projects/demo-product/project.json
-      - name: Verify rendered media
+      - name: Verify primary
         run: npm run verify:render -- projects/demo-product/project.json
+      - name: Render derivatives
+        run: npm run render:derivatives -- projects/demo-product/project.json
+      - name: Verify media stack
+        run: npm run verify:media-stack -- projects/demo-product/project.json
       - uses: actions/upload-artifact@v4
         with:
           name: video-studio-demo
           path: |
             output/remotion-demo.mp4
+            output/remotion-demo.webm
+            output/remotion-demo.gif
+            output/remotion-demo-normalized.mp4
             package-lock.json

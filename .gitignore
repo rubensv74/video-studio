@@ -8,3 +8,4 @@ apps/**/.cache/
 apps/**/dist/
 apps/**/out/
 apps/**/output/
+apps/remotion-studio/public/fixtures/
