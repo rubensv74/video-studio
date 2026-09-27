@@ -40,6 +40,7 @@ docs/ai-media.md
 docs/architecture.md
 docs/capability-matrix.md
 docs/dependency-baseline.md
+docs/external-runtime.md
 docs/gates.md
 docs/licensing.md
 docs/media-stack.md
@@ -55,6 +56,7 @@ docs/vs-g06-evidence.md
 docs/vs-g07-evidence.md
 docs/vs-g08-evidence.md
 docs/vs-g09-evidence.md
+docs/vs-g10-evidence.md
 fixtures/productization/data.json
 fixtures/productization/project.json
 output/.gitkeep
@@ -81,12 +83,17 @@ scripts/lib/batch-contract.mjs
 scripts/lib/control-plane-service.mjs
 scripts/lib/data-adapter.mjs
 scripts/lib/dependency-contract.mjs
+scripts/lib/external-runtime-adapter.mjs
 scripts/lib/manifest.mjs
 scripts/lib/media-provider.mjs
 scripts/lib/operational-store.mjs
 scripts/lib/queue-executor.mjs
 scripts/lib/render-cache.mjs
+scripts/lib/resilience.mjs
+scripts/lib/runtime-bootstrap.mjs
+scripts/lib/runtime-profile.mjs
 scripts/lib/scaffold.mjs
+scripts/lib/secret-resolver.mjs
 scripts/lib/worker-adapter.mjs
 scripts/postprocess.mjs
 scripts/probe-media.mjs
@@ -97,6 +104,7 @@ scripts/render.mjs
 scripts/smoke-foundation.mjs
 scripts/test-ai-media.mjs
 scripts/test-control-plane.mjs
+scripts/test-external-runtime.mjs
 scripts/test-operations-access.mjs
 scripts/test-productization.mjs
 scripts/test-scale.mjs

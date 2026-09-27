@@ -72,3 +72,16 @@
 | Admin audit API | Control Plane API | Verified |
 | Durable external database | Store adapter | Future provider |
 | External identity / OIDC | Access adapter | Future provider |
+
+| Runtime deployment profiles | External runtime layer | Verified |
+| Environment-driven production bootstrap | External runtime layer | Verified |
+| Runtime secret resolver | External runtime layer | Verified |
+| Provider health discovery | External runtime layer | Verified |
+| Provider capability discovery | External runtime layer | Verified |
+| Retry / exponential backoff | Resilience layer | Verified |
+| Request timeout | Resilience layer | Verified |
+| Circuit breaker / recovery | Resilience layer | Verified |
+| External render-worker adapter | External runtime layer | Verified contract |
+| External operational-store adapter | External runtime layer | Verified contract |
+| Control Plane runtime diagnostics | Control Plane API/UI | Verified |
+| Concrete cloud provider deployment | Provider adapter | Not provisioned |

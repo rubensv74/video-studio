@@ -211,3 +211,54 @@ This keeps UI deployment independent from future worker deployment. A later clou
 - Coupling the manifest to AWS, Azure, Vercel or another provider.
 - AI service credentials committed to the repository.
 - Hiding third-party licensing requirements.
+
+
+## External runtime
+
+The production runtime is selected outside project manifests.
+
+```text
+Environment / deployment profile
+            |
+            v
+      Runtime Bootstrap
+       /           \
+      v             v
+Secret Resolver   Runtime Profile
+      |             |
+      +------+------+ 
+             |
+     +-------+--------+
+     |                |
+     v                v
+External Worker   External Store
+     |                |
+     +-------+--------+
+             |
+             v
+       Control Plane
+             |
+             v
+   Neutral project manifests
+```
+
+The external worker contract provides:
+
+- health;
+- capabilities;
+- job submission;
+- retries;
+- timeout;
+- circuit state.
+
+The external store contract provides:
+
+- health;
+- run list/upsert;
+- audit list/append;
+- snapshot;
+- retries;
+- timeout;
+- circuit state.
+
+No provider credential is serialized into project manifests or runtime diagnostics.

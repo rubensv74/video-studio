@@ -220,6 +220,28 @@ secret:media/provider-token
 
 Raw secret values are rejected by the credential-reference contract.
 
+## External provider runtime
+
+Video Studio now supports explicit runtime profiles:
+
+- `local` — local renderer and local operational store;
+- `ci` — deterministic provider-independent verification;
+- `production` — external worker and operational store are mandatory.
+
+Production startup is environment-driven:
+
+```text
+VIDEO_STUDIO_PROFILE=production
+VIDEO_STUDIO_WORKER_URL=https://worker.example.com
+VIDEO_STUDIO_WORKER_CREDENTIAL_REF=env:VIDEO_STUDIO_WORKER_TOKEN
+VIDEO_STUDIO_STORE_URL=https://store.example.com
+VIDEO_STUDIO_STORE_CREDENTIAL_REF=env:VIDEO_STUDIO_STORE_TOKEN
+```
+
+The Control Plane exposes `GET /api/runtime` and shows worker/store health, capability discovery and circuit-breaker state without exposing secret values.
+
+External-provider resilience includes timeout, exponential retry/backoff and circuit-breaker recovery.
+
 ## Studios
 
 Remotion Studio:
@@ -267,6 +289,7 @@ The manifest remains the anti-lock-in boundary.
 - **VS-G07 — Control Plane:** VERIFIED
 - **VS-G08 — AI Media Adapters:** VERIFIED
 - **VS-G09 — Operational Persistence & Access:** VERIFIED
+- **VS-G10 — External Provider Runtime:** VERIFIED
 
 The original foundation roadmap G01–G06 is now closed.
 
@@ -280,3 +303,4 @@ Reference evidence:
 - `docs/vs-g07-evidence.md`
 - `docs/vs-g08-evidence.md`
 - `docs/vs-g09-evidence.md`
+- `docs/vs-g10-evidence.md`

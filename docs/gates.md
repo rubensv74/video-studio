@@ -261,3 +261,53 @@ Candidate scope:
 - deployment profile separating local, CI and production operation.
 
 The neutral project manifest remains unchanged.
+
+
+## VS-G10 — External Provider Runtime
+
+**Status: VERIFIED — merged through PR #24**
+
+Verified:
+
+- local / ci / production profiles;
+- production bootstrap fail-fast;
+- runtime secret-reference resolution;
+- raw secret-value rejection;
+- health/capability discovery;
+- request timeout;
+- exponential retry/backoff;
+- circuit breaker with recovery;
+- external render-worker contract;
+- external operational-store contract;
+- Control Plane runtime diagnostics;
+- external render delegation;
+- delegated run state persisted externally;
+- CI runs under explicit `ci` profile;
+- VS-G01 through VS-G09 regressions remain green.
+
+Reference run:
+
+`36323434885`
+
+Artifact:
+
+- ID: `10933161406`;
+- size: `17,718,699 bytes`;
+- digest: `sha256:fa306da54cc97b3965c1f4c543ba5ce941596d988886709f210579669edccbca`.
+
+See `docs/vs-g10-evidence.md`.
+
+## Next extension gate
+
+**VS-G11 — Concrete Cloud Binding**
+
+The core is ready to bind real infrastructure. A provider-specific deployment should be treated as an adapter implementation, not as a change to project manifests.
+
+Candidate split:
+
+- durable operational metadata: PostgreSQL/Supabase-class provider;
+- Control Plane / lightweight API hosting: Vercel-class provider;
+- render worker: compute environment able to run Chromium/Remotion/FFmpeg with appropriate CPU/memory/runtime limits;
+- secret resolution: deployment secret store.
+
+Creating or provisioning paid external resources requires an explicit provider/account/cost decision.
