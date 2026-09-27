@@ -473,3 +473,22 @@ select:focus {
     height: 150px;
   }
 }
+
+.project-card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 120px;
+  border: 1px solid rgba(147, 164, 184, 0.22);
+  border-radius: 12px;
+  background: rgba(7, 17, 31, 0.72);
+  color: #f4fbff;
+  padding: 12px 14px;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.project-card textarea:focus {
+  outline: 1px solid rgba(0, 200, 255, 0.72);
+  border-color: rgba(0, 200, 255, 0.72);
+}
