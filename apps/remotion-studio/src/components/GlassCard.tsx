@@ -1,17 +1,23 @@
 import React from 'react';
-import {videoTheme} from '@video-studio/design-system';
+import {useVideoTheme} from './VideoThemeContext';
 
-export const GlassCard: React.FC<React.PropsWithChildren<{style?: React.CSSProperties}>> = ({children, style}) => (
-  <div
-    style={{
-      border: `1px solid ${videoTheme.colors.line}`,
-      background: 'rgba(16,26,43,0.72)',
-      borderRadius: videoTheme.radius.md,
-      boxShadow: '0 18px 70px rgba(0,0,0,0.30)',
-      backdropFilter: 'blur(18px)',
-      ...style,
-    }}
-  >
-    {children}
-  </div>
-);
+export const GlassCard: React.FC<
+  React.PropsWithChildren<{style?: React.CSSProperties}>
+> = ({children, style}) => {
+  const theme = useVideoTheme();
+
+  return (
+    <div
+      style={{
+        border: `1px solid ${theme.colors.line}`,
+        background: theme.colors.panel,
+        borderRadius: theme.radius.md,
+        boxShadow: '0 18px 70px rgba(0,0,0,0.30)',
+        opacity: 0.92,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+};

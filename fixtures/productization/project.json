@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "id": "data-adapter-fixture",
+  "title": "Data Adapter Fixture",
+  "engine": "remotion",
+  "compositionId": "ProductDemo",
+  "theme": "default-dark",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "mp4",
+    "file": "output/data-adapter-fixture.mp4"
+  },
+  "data": {
+    "inline": {
+      "source": "inline",
+      "projectCode": "INLINE-WILL-BE-OVERRIDDEN"
+    },
+    "jsonFiles": ["data.json"]
+  },
+  "scenes": [
+    {"id": "intro", "type": "hero", "durationSeconds": 1}
+  ]
+}
