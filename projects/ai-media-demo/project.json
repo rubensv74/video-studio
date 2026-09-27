@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "id": "ai-media-demo",
+  "title": "Video Studio — AI Media Adapter Demo",
+  "engine": "remotion",
+  "compositionId": "ProductDemo",
+  "theme": "blueprint-cyan",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "mp4",
+    "file": "output/ai-media-demo.mp4"
+  },
+  "media": {
+    "imageTracks": [
+      {
+        "id": "generated-image",
+        "src": "generated-media/ai-image.svg",
+        "startSeconds": 0,
+        "durationSeconds": 8,
+        "opacity": 0.26,
+        "objectFit": "cover",
+        "layout": {
+          "x": 960,
+          "y": 140,
+          "width": 820,
+          "height": 620,
+          "borderRadius": 28
+        }
+      }
+    ],
+    "audioTracks": [
+      {
+        "id": "generated-tts",
+        "role": "voiceover",
+        "src": "generated-media/ai-voice.wav",
+        "startSeconds": 0,
+        "volume": 0.9
+      }
+    ],
+    "captionTracks": [
+      {
+        "id": "generated-transcript",
+        "src": "generated-media/ai-captions.srt",
+        "format": "srt",
+        "startSeconds": 0
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "id": "intro",
+      "type": "hero",
+      "durationSeconds": 3,
+      "payload": {
+        "eyebrow": "AI MEDIA ADAPTERS",
+        "title": "Provider-neutral assets",
+        "subtitle": "Image · TTS · transcription"
+      }
+    },
+    {
+      "id": "capabilities",
+      "type": "capability-grid",
+      "durationSeconds": 3,
+      "payload": {
+        "items": [
+          "Image providers",
+          "TTS providers",
+          "Transcription",
+          "Asset registry",
+          "HTTP boundary",
+          "Normal media stack"
+        ]
+      }
+    },
+    {
+      "id": "outro",
+      "type": "outro",
+      "durationSeconds": 2,
+      "payload": {
+        "title": "Providers create assets. Video Studio renders them."
+      }
+    }
+  ]
+}

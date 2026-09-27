@@ -68,3 +68,17 @@ export type RunSummary = {
 export type RunsResponse = {
   runs: RunSummary[];
 };
+
+export type MediaAssetSummary = {
+  id: string;
+  kind: 'image' | 'tts' | 'transcription';
+  provider: string;
+  mediaType?: string;
+  file?: string;
+  createdAt?: string;
+  metadata?: Record<string, unknown>;
+};
+
+export type MediaHistoryResponse = {
+  assets: MediaAssetSummary[];
+};

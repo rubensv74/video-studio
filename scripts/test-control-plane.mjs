@@ -10,7 +10,27 @@ fs.rmSync(path.resolve('.generated/control-plane-test'), {
   force: true,
 });
 
-const service = createControlPlaneService({projectRoot});
+const mediaAssets = [];
+const mediaProvider = {
+  listAssets: () => mediaAssets,
+  generateImage: async (request) => {
+    const asset = {id: 'media-image-test', kind: 'image', provider: 'test', request};
+    mediaAssets.unshift(asset);
+    return asset;
+  },
+  synthesizeSpeech: async (request) => {
+    const asset = {id: 'media-tts-test', kind: 'tts', provider: 'test', request};
+    mediaAssets.unshift(asset);
+    return asset;
+  },
+  transcribe: async (request) => {
+    const asset = {id: 'media-transcription-test', kind: 'transcription', provider: 'test', request};
+    mediaAssets.unshift(asset);
+    return asset;
+  },
+};
+
+const service = createControlPlaneService({projectRoot, mediaProvider});
 const server = http.createServer(service.handler);
 
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -25,6 +45,7 @@ try {
   const health = await healthResponse.json();
   assert.equal(health.status, 'ok');
   assert.ok(health.capabilities.includes('render-submission'));
+  assert.ok(health.capabilities.includes('media-generation'));
   console.log('PASS control-plane health');
 
   const catalogResponse = await fetch(`${base}/api/catalog`);
@@ -103,6 +124,35 @@ try {
   });
   assert.equal(projectValidation.status, 200);
   console.log('PASS control-plane project render submission contract');
+
+  const mediaCreate = await fetch(`${base}/api/media`, {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({
+      kind: 'image',
+      prompt: 'Control plane media fixture',
+      width: 640,
+      height: 360,
+    }),
+  });
+  assert.equal(mediaCreate.status, 201);
+  const mediaCreated = await mediaCreate.json();
+  assert.equal(mediaCreated.asset.kind, 'image');
+
+  const mediaList = await fetch(`${base}/api/media`);
+  assert.equal(mediaList.status, 200);
+  const mediaHistory = await mediaList.json();
+  assert.equal(mediaHistory.assets.length, 1);
+  assert.equal(mediaHistory.assets[0].id, 'media-image-test');
+  console.log('PASS control-plane media generation/history');
+
+  const mediaInvalid = await fetch(`${base}/api/media`, {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({kind: 'unknown'}),
+  });
+  assert.equal(mediaInvalid.status, 400);
+  console.log('PASS control-plane media-kind validation');
 
   const runsResponse = await fetch(`${base}/api/runs`);
   assert.equal(runsResponse.status, 200);

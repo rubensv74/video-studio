@@ -138,6 +138,41 @@ export const validateProject = (project) => {
   }
 
   const fits = ['contain', 'cover', 'fill', 'none', 'scale-down'];
+
+  for (const track of project.media?.imageTracks ?? []) {
+    registerMediaId(track.id, 'imageTrack');
+    if (!nonEmpty(track.src)) errors.push(`image track ${track.id || '?'} src is required`);
+    if (
+      track.startSeconds !== undefined &&
+      !nonNegativeNumber(track.startSeconds)
+    ) {
+      errors.push(`image track ${track.id || '?'} startSeconds must be >= 0`);
+    }
+    if (
+      track.durationSeconds !== undefined &&
+      !positiveNumber(track.durationSeconds)
+    ) {
+      errors.push(`image track ${track.id || '?'} durationSeconds must be > 0`);
+    }
+    if (track.objectFit !== undefined && !fits.includes(track.objectFit)) {
+      errors.push(`image track ${track.id || '?'} objectFit is unsupported`);
+    }
+    if (
+      track.opacity !== undefined &&
+      (!Number.isFinite(Number(track.opacity)) ||
+        Number(track.opacity) < 0 ||
+        Number(track.opacity) > 1)
+    ) {
+      errors.push(`image track ${track.id || '?'} opacity must be between 0 and 1`);
+    }
+    for (const key of ['width', 'height']) {
+      const value = track.layout?.[key];
+      if (value !== undefined && !positiveNumber(value)) {
+        errors.push(`image track ${track.id || '?'} layout.${key} must be > 0`);
+      }
+    }
+  }
+
   for (const track of project.media?.videoTracks ?? []) {
     registerMediaId(track.id, 'videoTrack');
     if (!nonEmpty(track.src)) errors.push(`video track ${track.id || '?'} src is required`);

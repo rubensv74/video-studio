@@ -15,6 +15,7 @@ import {
   loadThemeCatalog,
   writeProject,
 } from './scaffold.mjs';
+import {createFixtureMediaProvider} from './media-provider.mjs';
 
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -91,12 +92,19 @@ export const createControlPlaneService = ({
   root = process.cwd(),
   projectRoot = 'projects',
   distDir = 'apps/control-plane/dist',
+  mediaProvider,
 } = {}) => {
   const absoluteRoot = path.resolve(root);
   const absoluteProjectRoot = path.resolve(absoluteRoot, projectRoot);
   const absoluteDist = path.resolve(absoluteRoot, distDir);
   const liveRuns = new Map();
   let runCounter = 0;
+  const media =
+    mediaProvider ??
+    createFixtureMediaProvider({
+      publicDir: path.join(absoluteRoot, 'apps/remotion-studio/public/generated-media'),
+      registryFile: path.join(absoluteRoot, 'output/generated-media/registry.json'),
+    });
 
   const catalog = () => {
     const projects = listProjectFiles(absoluteProjectRoot).flatMap((file) => {
@@ -292,6 +300,8 @@ export const createControlPlaneService = ({
             'batch-submission',
             'run-history',
             'cache-aware-scale-layer',
+            'media-generation',
+            'media-history',
           ],
         });
         return;
@@ -304,6 +314,39 @@ export const createControlPlaneService = ({
 
       if (request.method === 'GET' && url.pathname === '/api/runs') {
         json(response, 200, {runs: runs()});
+        return;
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/media') {
+        json(response, 200, {assets: media.listAssets?.() ?? []});
+        return;
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/media') {
+        const body = await readBody(request);
+        let asset;
+
+        if (body.kind === 'image') {
+          asset = await media.generateImage({
+            prompt: body.prompt,
+            width: body.width,
+            height: body.height,
+          });
+        } else if (body.kind === 'tts') {
+          asset = await media.synthesizeSpeech({
+            text: body.text,
+            voice: body.voice,
+          });
+        } else if (body.kind === 'transcription') {
+          asset = await media.transcribe({
+            audioFile: body.audioFile,
+            fixtureTranscript: body.fixtureTranscript,
+          });
+        } else {
+          throw new Error('media kind must be image, tts or transcription');
+        }
+
+        json(response, 201, {status: 'created', asset});
         return;
       }
 

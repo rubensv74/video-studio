@@ -2,6 +2,7 @@ import type {
   CatalogResponse,
   HealthResponse,
   RunsResponse,
+  MediaHistoryResponse,
 } from './types';
 
 const request = async <T>(
@@ -48,5 +49,15 @@ export const controlPlaneApi = {
     request<{status: string; runId: string}>('/api/renders', {
       method: 'POST',
       body: JSON.stringify({kind: 'batch', path, dryRun: false}),
+    }),
+  media: () => request<MediaHistoryResponse>('/api/media'),
+  createMedia: (payload:
+    | {kind: 'image'; prompt: string; width?: number; height?: number}
+    | {kind: 'tts'; text: string; voice?: string}
+    | {kind: 'transcription'; audioFile: string; fixtureTranscript?: string}
+  ) =>
+    request<{status: string; asset: unknown}>('/api/media', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
 };

@@ -22,7 +22,7 @@
     "test:productization": "node scripts/test-productization.mjs",
     "test:scale": "node scripts/test-scale.mjs",
     "create:project": "node scripts/create-project.mjs",
-    "check": "node scripts/check-env.mjs && npm run smoke && npm run validate:advanced && npm run test:productization && npm run test:scale && npm run test:control-plane && npm run typecheck",
+    "check": "node scripts/check-env.mjs && npm run smoke && npm run validate:advanced && npm run validate:ai-media && npm run test:productization && npm run test:scale && npm run test:control-plane && npm run test:ai-media && npm run typecheck",
     "probe": "node scripts/probe-media.mjs",
     "postprocess": "node scripts/postprocess.mjs",
     "render": "node scripts/render.mjs",
@@ -39,7 +39,12 @@
     "render:productization": "node scripts/render-productization-fixtures.mjs",
     "verify:runtime-theme": "node scripts/verify-theme-render.mjs",
     "render:batch": "node scripts/render-batch.mjs",
-    "verify:scale-report": "node scripts/verify-scale-report.mjs"
+    "verify:scale-report": "node scripts/verify-scale-report.mjs",
+    "test:ai-media": "node scripts/test-ai-media.mjs",
+    "fixtures:ai-media": "node scripts/generate-ai-media-fixtures.mjs",
+    "validate:ai-media": "node scripts/validate-project.mjs projects/ai-media-demo/project.json",
+    "render:ai-media": "node scripts/render.mjs projects/ai-media-demo/project.json",
+    "verify:ai-media": "node scripts/verify-ai-media-demo.mjs"
   },
   "engines": {
     "node": ">=20"

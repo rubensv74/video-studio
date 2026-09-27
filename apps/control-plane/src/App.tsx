@@ -5,6 +5,7 @@ import type {
   CatalogResponse,
   HealthResponse,
   RunSummary,
+  MediaAssetSummary,
 } from './types';
 
 const emptyCatalog: CatalogResponse = {
@@ -37,6 +38,7 @@ export const App: React.FC = () => {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [catalog, setCatalog] = useState<CatalogResponse>(emptyCatalog);
   const [runs, setRuns] = useState<RunSummary[]>([]);
+  const [mediaAssets, setMediaAssets] = useState<MediaAssetSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
@@ -45,18 +47,24 @@ export const App: React.FC = () => {
     preset: 'landscape-16x9',
     theme: 'default-dark',
   });
+  const [mediaForm, setMediaForm] = useState({
+    kind: 'image' as 'image' | 'tts' | 'transcription',
+    value: 'Industrial blueprint visualization for a programmatic video.',
+  });
 
   const refresh = async () => {
     try {
       setError(null);
-      const [healthData, catalogData, runsData] = await Promise.all([
+      const [healthData, catalogData, runsData, mediaData] = await Promise.all([
         controlPlaneApi.health(),
         controlPlaneApi.catalog(),
         controlPlaneApi.runs(),
+        controlPlaneApi.media(),
       ]);
       setHealth(healthData);
       setCatalog(catalogData);
       setRuns(runsData.runs);
+      setMediaAssets(mediaData.assets);
       setForm((current) => ({
         ...current,
         preset: catalogData.presets.some((item) => item.id === current.preset)
@@ -96,6 +104,41 @@ export const App: React.FC = () => {
     }
   };
 
+  const createMedia = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      setBusy(true);
+      setError(null);
+
+      if (mediaForm.kind === 'image') {
+        await controlPlaneApi.createMedia({
+          kind: 'image',
+          prompt: mediaForm.value,
+          width: 1600,
+          height: 900,
+        });
+      } else if (mediaForm.kind === 'tts') {
+        await controlPlaneApi.createMedia({
+          kind: 'tts',
+          text: mediaForm.value,
+          voice: 'fixture-neutral',
+        });
+      } else {
+        await controlPlaneApi.createMedia({
+          kind: 'transcription',
+          audioFile: 'apps/remotion-studio/public/generated-media/ai-voice.wav',
+          fixtureTranscript: mediaForm.value,
+        });
+      }
+
+      await refresh();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const launchBatch = async (batch: BatchSummary) => {
     try {
       setBusy(true);
@@ -125,6 +168,7 @@ export const App: React.FC = () => {
           <a className="nav-item" href="#projects">Projects</a>
           <a className="nav-item" href="#batches">Batches</a>
           <a className="nav-item" href="#runs">Runs</a>
+          <a className="nav-item" href="#media">Media Lab</a>
         </nav>
 
         <div className="sidebar__footer">
@@ -168,6 +212,7 @@ export const App: React.FC = () => {
           <Metric label="BATCHES" value={catalog.batches.length} detail="queue definitions" />
           <Metric label="RUNS" value={runs.length} detail={`${completedRuns} completed`} />
           <Metric label="THEMES" value={catalog.themes.length} detail="runtime brand packs" />
+          <Metric label="ASSETS" value={mediaAssets.length} detail="generated media" />
         </section>
 
         <section id="projects" className="grid-section">
@@ -258,6 +303,65 @@ export const App: React.FC = () => {
                 >
                   Launch batch
                 </button>
+              </article>
+            ))}
+          </div>
+        </section>
+
+
+        <section id="media" className="grid-section">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">MEDIA LAB / VS-G08</span>
+              <h3>Generated media</h3>
+            </div>
+          </div>
+
+          <div className="project-grid">
+            <form className="project-card project-card--create" onSubmit={createMedia}>
+              <span className="eyebrow">NEW GENERATED ASSET</span>
+              <select
+                value={mediaForm.kind}
+                onChange={(event) =>
+                  setMediaForm({
+                    kind: event.target.value as 'image' | 'tts' | 'transcription',
+                    value: mediaForm.value,
+                  })
+                }
+              >
+                <option value="image">Image</option>
+                <option value="tts">TTS</option>
+                <option value="transcription">Transcription</option>
+              </select>
+              <textarea
+                value={mediaForm.value}
+                onChange={(event) =>
+                  setMediaForm({...mediaForm, value: event.target.value})
+                }
+                rows={5}
+                placeholder="Prompt, text or transcript fixture"
+                required
+              />
+              <button className="button" disabled={busy} type="submit">
+                Generate asset
+              </button>
+              <small className="muted">
+                Local mode uses deterministic fixtures. Production providers plug in through the HTTP media-provider boundary.
+              </small>
+            </form>
+
+            {mediaAssets.slice(0, 8).map((asset) => (
+              <article className="project-card" key={asset.id}>
+                <div className="project-card__meta">
+                  <span>{asset.kind}</span>
+                  <span>{asset.provider}</span>
+                </div>
+                <h4>{asset.id}</h4>
+                <p>{asset.file ?? 'provider-managed asset'}</p>
+                <div className="project-card__output">
+                  <strong>{asset.mediaType ?? 'generated media'}</strong>
+                  <span>{asset.createdAt ?? 'current session'}</span>
+                </div>
               </article>
             ))}
           </div>
