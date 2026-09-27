@@ -45,6 +45,10 @@ This avoids coupling a video project to a single engine or cloud provider.
 - JSON batch reporting
 - CI-ready headless rendering
 - Multi-engine source architecture
+- React web Control Plane
+- Provider-neutral Control Plane API
+- Safe project creation and render/batch submission
+- Run/report history and operational catalog
 
 See `docs/capability-matrix.md` for the complete capability map.
 
@@ -133,6 +137,36 @@ npm run extract:advanced-qa
 npm run verify:advanced-qa
 ```
 
+## Control Plane
+
+Development uses two processes:
+
+```bash
+npm run serve:control-plane
+npm run dev:control-plane
+```
+
+The React UI runs on port `4173` and proxies `/api` to the local Control Plane service on port `4100`.
+
+Production-style local serving:
+
+```bash
+npm run build:control-plane
+npm run serve:control-plane
+```
+
+The Node service then serves both the built UI and API from one origin.
+
+Verified API surfaces:
+
+- `GET /api/health`
+- `GET /api/catalog`
+- `GET /api/runs`
+- `POST /api/projects`
+- `POST /api/renders`
+
+The browser never invokes FFmpeg or a shell directly. Render requests are validated by the service and delegated to the existing renderer/batch layer using `spawn(..., shell: false)`.
+
 ## Studios
 
 Remotion Studio:
@@ -177,6 +211,7 @@ The manifest remains the anti-lock-in boundary.
 - **VS-G04 — Advanced Visuals:** VERIFIED
 - **VS-G05 — Productization:** VERIFIED
 - **VS-G06 — Scale:** VERIFIED
+- **VS-G07 — Control Plane:** VERIFIED
 
 The original foundation roadmap G01–G06 is now closed.
 
@@ -187,3 +222,4 @@ Reference evidence:
 - `docs/vs-g04-evidence.md`
 - `docs/vs-g05-evidence.md`
 - `docs/vs-g06-evidence.md`
+- `docs/vs-g07-evidence.md`

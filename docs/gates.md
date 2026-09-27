@@ -92,3 +92,67 @@ Capabilities beyond this point are extensions rather than prerequisites for the 
 - TTS/transcription providers;
 - a browser-based render control plane;
 - organization-level governance/observability.
+
+
+## VS-G07 — Control Plane
+
+**Status: VERIFIED — PR #15**
+
+Verified:
+
+- React/Vite Control Plane workspace;
+- production UI build;
+- provider-neutral Node HTTP API;
+- health/capability endpoint;
+- project/preset/theme/batch catalog;
+- safe project scaffolding endpoint;
+- safe project and batch submission contract;
+- path traversal rejection;
+- shell-injection-shaped target rejection;
+- run/report history endpoint;
+- static production serving boundary;
+- existing VS-G01 through VS-G06 regression pipeline remains green.
+
+Reference run:
+
+`36313713092`
+
+API evidence:
+
+```text
+PASS control-plane health
+PASS control-plane catalog
+PASS control-plane project scaffolding
+PASS control-plane path traversal rejection
+PASS control-plane shell-injection-shaped target rejection
+PASS control-plane batch submission contract
+PASS control-plane project render submission contract
+PASS control-plane run history
+PASS VS-G07 control-plane API contract
+```
+
+UI build evidence:
+
+```text
+vite v4.5.14 building for production...
+✓ built in 1.27s
+```
+
+Artifact:
+
+- ID: `10929952093`;
+- size: `15,075,265 bytes`;
+- digest: `sha256:665411b34252474c0d3d05d622a238511d343f87e662f249dd0c9be969b8c217`.
+
+See `docs/vs-g07-evidence.md`.
+
+## Extension roadmap
+
+The verified Control Plane opens the next extension gates without changing the core manifest:
+
+- authentication / authorization;
+- concrete cloud worker providers;
+- persistent operational database;
+- AI asset-generation adapters;
+- TTS and transcription providers;
+- organization-level governance and observability.

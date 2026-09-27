@@ -45,3 +45,11 @@
 | AI-generated assets | External asset producer | Pluggable, not coupled |
 | TTS voice generation | External audio producer | Pluggable, not coupled |
 | Automatic subtitles | External transcription producer | Pluggable, not coupled |
+
+| React Control Plane | `apps/control-plane` | Verified build |
+| Control Plane health/catalog API | Node HTTP service | Verified |
+| Safe project scaffolding API | Control Plane service | Verified |
+| Safe render/batch submission API | Control Plane service | Verified contract |
+| Path traversal protection | Control Plane service | Verified |
+| Shell-free process delegation | Node `spawn` boundary | Verified design + tests |
+| Run/report history | Control Plane service | Verified |
