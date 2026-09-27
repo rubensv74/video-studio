@@ -13,6 +13,85 @@
     "file": "output/remotion-demo.mp4"
   },
   "audio": {},
+  "media": {
+    "audioTracks": [
+      {
+        "id": "music-bed",
+        "role": "music",
+        "src": "fixtures/music.m4a",
+        "startSeconds": 0,
+        "durationSeconds": 10,
+        "volume": 0.22
+      },
+      {
+        "id": "voiceover-fixture",
+        "role": "voiceover",
+        "src": "fixtures/voiceover-fixture.m4a",
+        "startSeconds": 1,
+        "durationSeconds": 8,
+        "volume": 0.55
+      }
+    ],
+    "videoTracks": [
+      {
+        "id": "video-fixture",
+        "src": "fixtures/clip.mp4",
+        "startSeconds": 3.2,
+        "durationSeconds": 2,
+        "muted": true,
+        "objectFit": "cover",
+        "opacity": 0.94,
+        "layout": {
+          "x": 1230,
+          "y": 650,
+          "width": 560,
+          "height": 315,
+          "borderRadius": 24
+        }
+      }
+    ],
+    "captionTracks": [
+      {
+        "id": "demo-captions",
+        "src": "fixtures/demo.srt",
+        "format": "srt",
+        "style": {
+          "bottom": 72,
+          "fontSize": 42,
+          "maxWidth": 1400,
+          "backgroundOpacity": 0.78
+        }
+      }
+    ]
+  },
+  "derivatives": [
+    {
+      "id": "webm-preview",
+      "format": "webm",
+      "file": "output/remotion-demo.webm"
+    },
+    {
+      "id": "gif-preview",
+      "format": "gif",
+      "file": "output/remotion-demo.gif",
+      "fps": 12,
+      "width": 640
+    },
+    {
+      "id": "png-sequence",
+      "format": "png-sequence",
+      "file": "output/frames/frame-%04d.png",
+      "fps": 1,
+      "width": 640
+    }
+  ],
+  "audioNormalization": {
+    "enabled": true,
+    "file": "output/remotion-demo-normalized.mp4",
+    "integratedLufs": -16,
+    "truePeakDb": -1.5,
+    "loudnessRange": 11
+  },
   "data": {
     "inline": {
       "product": "Video Studio",
@@ -35,7 +114,14 @@
       "type": "capability-grid",
       "durationSeconds": 5,
       "payload": {
-        "items": ["UI demos", "Technical diagrams", "Data-driven scenes", "Audio + captions", "WebGL / 3D", "Batch rendering"]
+        "items": [
+          "UI demos",
+          "Technical diagrams",
+          "Data-driven scenes",
+          "Audio + captions",
+          "WebGL / 3D",
+          "Batch rendering"
+        ]
       }
     },
     {

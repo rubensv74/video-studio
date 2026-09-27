@@ -20,7 +20,10 @@
     "render": "node scripts/render.mjs",
     "typecheck:remotion": "npm --workspace @video-studio/remotion-studio run typecheck",
     "typecheck:motion-canvas": "npm --workspace @video-studio/motion-canvas-studio run typecheck",
-    "typecheck": "npm run typecheck:remotion && npm run typecheck:motion-canvas"
+    "typecheck": "npm run typecheck:remotion && npm run typecheck:motion-canvas",
+    "fixtures:media": "node scripts/generate-media-fixtures.mjs",
+    "render:derivatives": "node scripts/render-derivatives.mjs",
+    "verify:media-stack": "node scripts/verify-media-stack.mjs"
   },
   "engines": {
     "node": ">=20"

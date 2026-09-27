@@ -12,6 +12,7 @@ import type {VideoProjectManifest, VideoScene} from '@video-studio/contracts';
 import {videoTheme} from '@video-studio/design-system';
 import {BlueprintGrid} from '../components/BlueprintGrid';
 import {GlassCard} from '../components/GlassCard';
+import {MediaLayer} from '../components/MediaLayer';
 
 const defaultCapabilities = [
   'UI demos',
@@ -286,6 +287,7 @@ export const ProductDemo: React.FC<VideoProjectManifest> = (project) => {
           </Sequence>
         );
       })}
+      <MediaLayer media={project.media} />
     </AbsoluteFill>
   );
 };

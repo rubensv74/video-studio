@@ -27,6 +27,12 @@ assert.equal(plan.fps, 30);
 assert.equal(plan.propsFile, path.resolve(manifestFile));
 assert.equal(plan.outputFile, path.resolve('output/remotion-demo.mp4'));
 
+assert.equal(project.media?.audioTracks?.length, 2);
+assert.equal(project.media?.videoTracks?.length, 1);
+assert.equal(project.media?.captionTracks?.length, 1);
+assert.equal(project.derivatives?.length, 3);
+assert.equal(project.audioNormalization?.enabled, true);
+
 const rootSource = fs.readFileSync(path.join(root, 'apps/remotion-studio/src/Root.tsx'), 'utf8');
 assert.match(rootSource, /CalculateMetadataFunction<VideoProjectManifest>/);
 assert.match(rootSource, /calculateMetadata=\{calculateMetadata\}/);
@@ -39,6 +45,16 @@ const compositionSource = fs.readFileSync(
   'utf8',
 );
 assert.match(compositionSource, /project\.scenes\.map/);
+assert.match(compositionSource, /<MediaLayer media=\{project\.media\}/);
+
+const mediaLayerSource = fs.readFileSync(
+  path.join(root, 'apps/remotion-studio/src/components/MediaLayer.tsx'),
+  'utf8',
+);
+assert.match(mediaLayerSource, /AudioTrackLayer/);
+assert.match(mediaLayerSource, /VideoTrackLayer/);
+assert.match(mediaLayerSource, /CaptionTrackLayer/);
+assert.match(mediaLayerSource, /parseSrt/);
 
 const remotionPackage = JSON.parse(
   fs.readFileSync(path.join(root, 'apps/remotion-studio/package.json'), 'utf8'),
@@ -72,7 +88,9 @@ console.log('PASS demo timing: 10s / 300 frames');
 console.log('PASS manifest -> Remotion --props render plan');
 console.log('PASS calculateMetadata controls width/height/fps/duration');
 console.log('PASS ProductDemo consumes manifest scenes');
+console.log('PASS VS-G03 timed media track contract');
+console.log('PASS VS-G03 derivative + normalization contract');
 console.log('PASS dependency version contract');
 console.log('PASS Motion Canvas official TypeScript base');
 console.log('PASS Motion Canvas FFmpeg exporter configured');
-console.log('PASS VS-G01 source-contract smoke gate');
+console.log('PASS Video Studio source-contract smoke gate');

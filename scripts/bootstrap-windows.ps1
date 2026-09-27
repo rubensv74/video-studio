@@ -26,15 +26,18 @@ else {
     Invoke-Step "Initial dependency install" { npm install --no-audit --no-fund }
 }
 
+Invoke-Step "Generate deterministic media fixtures" { npm run fixtures:media }
 Invoke-Step "Foundation checks" { npm run check }
-Invoke-Step "Render demo" { npm run render -- projects/demo-product/project.json }
-Invoke-Step "Verify rendered media" { npm run verify:render -- projects/demo-product/project.json }
+Invoke-Step "Render primary" { npm run render -- projects/demo-product/project.json }
+Invoke-Step "Verify primary" { npm run verify:render -- projects/demo-product/project.json }
+Invoke-Step "Render derivatives" { npm run render:derivatives -- projects/demo-product/project.json }
+Invoke-Step "Verify media stack" { npm run verify:media-stack -- projects/demo-product/project.json }
 
 if (-not (Test-Path "package-lock.json")) {
     throw "package-lock.json was not generated"
 }
 
 Write-Host ""
-Write-Host "PASS VS-G02 local bootstrap"
-Write-Host "Output: output/remotion-demo.mp4"
-Write-Host "Lockfile: package-lock.json"
+Write-Host "PASS Video Studio local bootstrap"
+Write-Host "Primary: output/remotion-demo.mp4"
+Write-Host "Media stack: VERIFIED"
