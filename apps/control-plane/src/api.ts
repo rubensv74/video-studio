@@ -9,6 +9,13 @@ import type {
 
 const tokenKey = 'video-studio.access-token';
 
+const apiBase = String(
+  import.meta.env.VITE_CONTROL_PLANE_API_BASE_URL ?? '',
+).replace(/\/$/, '');
+
+const apiUrl = (pathname: string) =>
+  apiBase ? `${apiBase}${pathname}` : pathname;
+
 export const setControlPlaneAccessToken = (token: string) => {
   if (typeof window === 'undefined') return;
   const value = token.trim();
@@ -26,7 +33,7 @@ const request = async <T>(
   options?: RequestInit,
 ): Promise<T> => {
   const token = getControlPlaneAccessToken();
-  const response = await fetch(url, {
+  const response = await fetch(apiUrl(url), {
     ...options,
     headers: {
       'content-type': 'application/json',
