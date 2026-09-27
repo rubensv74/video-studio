@@ -311,3 +311,47 @@ Candidate split:
 - secret resolution: deployment secret store.
 
 Creating or provisioning paid external resources requires an explicit provider/account/cost decision.
+
+
+## VS-G11 — Concrete Cloud Binding
+
+**Status: VERIFIED — merged through PR #26**
+
+Verified:
+
+- Supabase PostgREST operational-store adapter;
+- modern Supabase secret-key handling through `apikey`;
+- dedicated custom-schema profile headers;
+- RLS-enabled operational schema;
+- explicit revocation from PUBLIC / anon / authenticated;
+- explicit server-side service_role grants;
+- production bootstrap selecting Supabase persistence;
+- explicit Control Plane CORS allowlist;
+- external API base URL in the Vite client;
+- Vercel static SPA deployment pack;
+- VS-G01 through VS-G10 regressions remain green.
+
+Reference run:
+
+`36324458542`
+
+Artifact:
+
+- ID: `10933122498`;
+- size: `17,719,391 bytes`;
+- digest: `sha256:0a7df606941c4a6ba3dd36044ac10826d049e92d55263454e7629cfbaffe6670`.
+
+See `docs/vs-g11-evidence.md`.
+
+### Provisioning state
+
+Repository bindings are verified. External account resources are **not yet provisioned**.
+
+Discovered state at gate closure:
+
+- Supabase organization is on the Free plan;
+- new Supabase project quote returned 0/month;
+- unrelated existing Supabase projects were deliberately not reused;
+- Vercel team currently contains no projects.
+
+Provisioning is the next authorized operation, not part of the G11 source gate.

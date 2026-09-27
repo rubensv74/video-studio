@@ -39,6 +39,7 @@ batches/productization-ci.json
 docs/ai-media.md
 docs/architecture.md
 docs/capability-matrix.md
+docs/cloud-binding.md
 docs/dependency-baseline.md
 docs/external-runtime.md
 docs/gates.md
@@ -57,6 +58,7 @@ docs/vs-g07-evidence.md
 docs/vs-g08-evidence.md
 docs/vs-g09-evidence.md
 docs/vs-g10-evidence.md
+docs/vs-g11-evidence.md
 fixtures/productization/data.json
 fixtures/productization/project.json
 output/.gitkeep
@@ -70,6 +72,7 @@ presets/video-presets.json
 projects/advanced-visuals-demo/project.json
 projects/ai-media-demo/project.json
 projects/demo-product/project.json
+providers/supabase/schema.sql
 scripts/bootstrap-unix.sh
 scripts/bootstrap-windows.ps1
 scripts/check-env.mjs
@@ -94,6 +97,7 @@ scripts/lib/runtime-bootstrap.mjs
 scripts/lib/runtime-profile.mjs
 scripts/lib/scaffold.mjs
 scripts/lib/secret-resolver.mjs
+scripts/lib/supabase-operational-store.mjs
 scripts/lib/worker-adapter.mjs
 scripts/postprocess.mjs
 scripts/probe-media.mjs
@@ -103,6 +107,7 @@ scripts/render-productization-fixtures.mjs
 scripts/render.mjs
 scripts/smoke-foundation.mjs
 scripts/test-ai-media.mjs
+scripts/test-concrete-cloud.mjs
 scripts/test-control-plane.mjs
 scripts/test-external-runtime.mjs
 scripts/test-operations-access.mjs
@@ -117,3 +122,4 @@ scripts/verify-render.mjs
 scripts/verify-scale-report.mjs
 scripts/verify-theme-render.mjs
 themes/catalog.json
+vercel.json

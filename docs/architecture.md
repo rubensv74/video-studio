@@ -262,3 +262,33 @@ The external store contract provides:
 - circuit state.
 
 No provider credential is serialized into project manifests or runtime diagnostics.
+
+
+## Concrete cloud provider pack
+
+The first concrete deployment mapping preserves the G10 boundaries:
+
+```text
+Vercel
+  |
+  +-- static Control Plane UI
+          |
+          | HTTPS + Bearer token
+          v
+External Control Plane backend
+          |
+          +------> External render worker
+          |
+          +------> Supabase PostgREST
+                        |
+                        v
+              video_studio_api
+                runs / audit_events
+```
+
+Supabase credentials are resolved only in the trusted backend runtime. The
+browser receives neither the Supabase project secret nor a direct operational
+database route.
+
+The render worker is intentionally not assigned to Vercel by this gate.
+Remotion/Chromium/FFmpeg execution remains a separate compute-provider decision.

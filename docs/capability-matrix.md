@@ -85,3 +85,12 @@
 | External operational-store adapter | External runtime layer | Verified contract |
 | Control Plane runtime diagnostics | Control Plane API/UI | Verified |
 | Concrete cloud provider deployment | Provider adapter | Not provisioned |
+
+| Supabase operational store | Concrete cloud binding | Verified contract |
+| Supabase custom schema profiles | Concrete cloud binding | Verified |
+| Supabase RLS/revoke/grant schema pack | Concrete cloud binding | Verified |
+| Cross-origin Control Plane API | Control Plane | Verified allowlist |
+| External API base for Vite UI | Control Plane | Verified build |
+| Vercel static UI deployment pack | Concrete cloud binding | Repository-ready |
+| Provisioned Supabase project | External account resource | Pending explicit approval |
+| Provisioned Vercel project | External account resource | Pending explicit approval |

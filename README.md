@@ -242,6 +242,32 @@ The Control Plane exposes `GET /api/runtime` and shows worker/store health, capa
 
 External-provider resilience includes timeout, exponential retry/backoff and circuit-breaker recovery.
 
+## Concrete cloud binding
+
+The first concrete provider pack is now repository-ready:
+
+- **Supabase** — durable run/audit operational persistence via PostgREST;
+- **Vercel** — static Vite hosting for the Control Plane UI;
+- **Render worker** — remains behind the G10 provider-neutral HTTP worker boundary.
+
+Supabase uses the dedicated `video_studio_api` schema with RLS enabled,
+explicit revocation from `PUBLIC`, `anon` and `authenticated`, and
+server-side `service_role` grants only.
+
+The Vercel UI calls a separately deployed backend using:
+
+```text
+VITE_CONTROL_PLANE_API_BASE_URL=https://control-plane-api.example.com
+```
+
+The backend accepts browser requests only from explicitly configured origins:
+
+```text
+VIDEO_STUDIO_ALLOWED_ORIGINS=https://<approved-ui-origin>
+```
+
+No cloud resource is created automatically by the repository.
+
 ## Studios
 
 Remotion Studio:
@@ -290,6 +316,7 @@ The manifest remains the anti-lock-in boundary.
 - **VS-G08 — AI Media Adapters:** VERIFIED
 - **VS-G09 — Operational Persistence & Access:** VERIFIED
 - **VS-G10 — External Provider Runtime:** VERIFIED
+- **VS-G11 — Concrete Cloud Binding:** VERIFIED
 
 The original foundation roadmap G01–G06 is now closed.
 
@@ -304,3 +331,4 @@ Reference evidence:
 - `docs/vs-g08-evidence.md`
 - `docs/vs-g09-evidence.md`
 - `docs/vs-g10-evidence.md`
+- `docs/vs-g11-evidence.md`
