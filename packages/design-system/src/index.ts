@@ -1,18 +1,32 @@
-export const videoTheme = {
+import themeCatalog from '../../../themes/catalog.json';
+
+export type VideoTheme = {
   colors: {
-    ink: '#0B1220',
-    panel: '#101A2B',
-    paper: '#F7FAFC',
-    muted: '#93A4B8',
-    accent: '#42C7B8',
-    line: '#2A3B52'
-  },
+    ink: string;
+    panel: string;
+    paper: string;
+    muted: string;
+    accent: string;
+    line: string;
+  };
   font: {
-    family: 'Inter, ui-sans-serif, system-ui, sans-serif'
-  },
+    family: string;
+  };
   radius: {
-    sm: 12,
-    md: 20,
-    lg: 32
+    sm: number;
+    md: number;
+    lg: number;
+  };
+};
+
+export const themePacks = themeCatalog as Record<string, VideoTheme>;
+
+export const getVideoTheme = (id: string): VideoTheme => {
+  const theme = themePacks[id];
+  if (!theme) {
+    throw new Error(`Unknown video theme: ${id}`);
   }
-} as const;
+  return theme;
+};
+
+export const videoTheme = getVideoTheme('default-dark');
