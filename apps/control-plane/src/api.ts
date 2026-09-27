@@ -4,6 +4,7 @@ import type {
   RunsResponse,
   MediaHistoryResponse,
   SessionResponse,
+  RuntimeDiagnosticsResponse,
 } from './types';
 
 const tokenKey = 'video-studio.access-token';
@@ -48,6 +49,7 @@ const request = async <T>(
 export const controlPlaneApi = {
   health: () => request<HealthResponse>('/api/health'),
   session: () => request<SessionResponse>('/api/session'),
+  runtime: () => request<RuntimeDiagnosticsResponse>('/api/runtime'),
   catalog: () => request<CatalogResponse>('/api/catalog'),
   runs: () => request<RunsResponse>('/api/runs'),
   createProject: (payload: {

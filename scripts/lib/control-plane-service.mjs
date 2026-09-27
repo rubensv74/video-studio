@@ -22,6 +22,8 @@ import {
   requireRole,
 } from './access-control.mjs';
 import {createOperationalStore} from './operational-store.mjs';
+import {getRuntimeProfile} from './runtime-profile.mjs';
+import {createRuntimeDiagnostics} from './external-runtime-adapter.mjs';
 
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -101,6 +103,9 @@ export const createControlPlaneService = ({
   mediaProvider,
   accessProvider,
   operationalStore,
+  workerRuntime,
+  runtimeProfile,
+  runtimeDiagnosticsProvider,
 } = {}) => {
   const absoluteRoot = path.resolve(root);
   const absoluteProjectRoot = path.resolve(absoluteRoot, projectRoot);
@@ -108,10 +113,18 @@ export const createControlPlaneService = ({
   const liveRuns = new Map();
   let runCounter = 0;
   const access = accessProvider ?? createAccessProviderFromEnv();
+  const profile = runtimeProfile ?? getRuntimeProfile();
   const store =
     operationalStore ??
     createOperationalStore({
       file: path.join(absoluteRoot, 'output/operations/store.json'),
+    });
+  const diagnostics =
+    runtimeDiagnosticsProvider ??
+    createRuntimeDiagnostics({
+      profile,
+      workerRuntime,
+      operationalStore: store,
     });
   const media =
     mediaProvider ??
@@ -187,9 +200,9 @@ export const createControlPlaneService = ({
         }
       });
 
-  const runs = () => {
+  const runs = async () => {
     const combined = [
-      ...store.listRuns(),
+      ...(await store.listRuns()),
       ...liveRuns.values(),
       ...reportRuns(),
     ];
@@ -206,7 +219,7 @@ export const createControlPlaneService = ({
     const principal = await access.authenticate(request);
     try {
       requireRole(principal, requiredRole);
-      store.appendAudit({
+      await store.appendAudit({
         action,
         method: request.method,
         outcome: 'allowed',
@@ -216,7 +229,7 @@ export const createControlPlaneService = ({
       });
       return principal;
     } catch (error) {
-      store.appendAudit({
+      await store.appendAudit({
         action,
         method: request.method,
         outcome: 'denied',
@@ -259,7 +272,7 @@ export const createControlPlaneService = ({
     throw new Error('kind must be project or batch');
   };
 
-  const startRun = ({kind, target}) => {
+  const startRun = async ({kind, target}) => {
     const id = `run-${Date.now()}-${++runCounter}`;
     const script = kind === 'batch' ? 'scripts/render-batch.mjs' : 'scripts/render.mjs';
     const startedAt = new Date().toISOString();
@@ -273,7 +286,39 @@ export const createControlPlaneService = ({
       exitCode: null,
     };
     liveRuns.set(id, record);
-    store.upsertRun(record);
+    await store.upsertRun(record);
+
+    if (workerRuntime?.submit) {
+      try {
+        const submitted = await workerRuntime.submit({
+          version: 1,
+          runId: id,
+          kind,
+          target: record.target,
+        });
+        const delegated = {
+          ...record,
+          status: submitted.status ?? 'accepted',
+          worker: workerRuntime.type ?? 'external',
+          providerRunId: submitted.jobId ?? submitted.runId ?? null,
+        };
+        liveRuns.set(id, delegated);
+        await store.upsertRun(delegated);
+        return {id, delegated: true, providerRunId: delegated.providerRunId};
+      } catch (error) {
+        const failed = {
+          ...record,
+          status: 'failed',
+          completedAt: new Date().toISOString(),
+          error: error instanceof Error ? error.message : String(error),
+          exitCode: -1,
+          worker: workerRuntime.type ?? 'external',
+        };
+        liveRuns.set(id, failed);
+        await store.upsertRun(failed);
+        throw error;
+      }
+    }
 
     const child = spawn(process.execPath, [script, target], {
       cwd: absoluteRoot,
@@ -290,7 +335,9 @@ export const createControlPlaneService = ({
         exitCode: -1,
       };
       liveRuns.set(id, failed);
-      store.upsertRun(failed);
+      void Promise.resolve(store.upsertRun(failed)).catch((storeError) => {
+        console.error('Failed to persist run error state', storeError);
+      });
     });
 
     child.on('exit', (code) => {
@@ -301,7 +348,9 @@ export const createControlPlaneService = ({
         exitCode: code,
       };
       liveRuns.set(id, completed);
-      store.upsertRun(completed);
+      void Promise.resolve(store.upsertRun(completed)).catch((storeError) => {
+        console.error('Failed to persist run completion state', storeError);
+      });
     });
 
     return {id};
@@ -357,9 +406,19 @@ export const createControlPlaneService = ({
             'operational-persistence',
             'role-based-access',
             'audit-history',
+            'runtime-diagnostics',
+            'external-worker-delegation',
+            'external-operational-store',
           ],
           accessMode: access.mode,
+          runtimeProfile: profile.id,
         });
+        return;
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/runtime') {
+        await authorize(request, 'viewer', 'runtime.read');
+        json(response, 200, await diagnostics.inspect());
         return;
       }
 
@@ -376,7 +435,7 @@ export const createControlPlaneService = ({
 
       if (request.method === 'GET' && url.pathname === '/api/audit') {
         await authorize(request, 'admin', 'audit.read');
-        json(response, 200, {events: store.listAudit()});
+        json(response, 200, {events: await store.listAudit()});
         return;
       }
 
@@ -388,7 +447,7 @@ export const createControlPlaneService = ({
 
       if (request.method === 'GET' && url.pathname === '/api/runs') {
         await authorize(request, 'viewer', 'runs.read');
-        json(response, 200, {runs: runs()});
+        json(response, 200, {runs: await runs()});
         return;
       }
 
@@ -465,8 +524,13 @@ export const createControlPlaneService = ({
           return;
         }
 
-        const run = startRun({kind: body.kind, target});
-        json(response, 202, {status: 'accepted', runId: run.id});
+        const run = await startRun({kind: body.kind, target});
+        json(response, 202, {
+          status: 'accepted',
+          runId: run.id,
+          delegated: Boolean(run.delegated),
+          providerRunId: run.providerRunId ?? null,
+        });
         return;
       }
 
@@ -494,6 +558,9 @@ export const createControlPlaneService = ({
     validateRenderTarget,
     operationalStore: store,
     accessMode: access.mode,
+    runtimeProfile: profile,
+    runtimeDiagnostics: diagnostics,
+    workerRuntime,
   };
 };
 

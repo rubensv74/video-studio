@@ -11,6 +11,7 @@ import type {
   RunSummary,
   MediaAssetSummary,
   SessionResponse,
+  RuntimeDiagnosticsResponse,
 } from './types';
 
 const emptyCatalog: CatalogResponse = {
@@ -45,6 +46,7 @@ export const App: React.FC = () => {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [mediaAssets, setMediaAssets] = useState<MediaAssetSummary[]>([]);
   const [session, setSession] = useState<SessionResponse | null>(null);
+  const [runtime, setRuntime] = useState<RuntimeDiagnosticsResponse | null>(null);
   const [accessToken, setAccessToken] = useState(() => getControlPlaneAccessToken());
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -65,13 +67,15 @@ export const App: React.FC = () => {
       const healthData = await controlPlaneApi.health();
       setHealth(healthData);
 
-      const [sessionData, catalogData, runsData, mediaData] = await Promise.all([
+      const [sessionData, runtimeData, catalogData, runsData, mediaData] = await Promise.all([
         controlPlaneApi.session(),
+        controlPlaneApi.runtime(),
         controlPlaneApi.catalog(),
         controlPlaneApi.runs(),
         controlPlaneApi.media(),
       ]);
       setSession(sessionData);
+      setRuntime(runtimeData);
       setCatalog(catalogData);
       setRuns(runsData.runs);
       setMediaAssets(mediaData.assets);
@@ -184,6 +188,7 @@ export const App: React.FC = () => {
           <a className="nav-item" href="#batches">Batches</a>
           <a className="nav-item" href="#runs">Runs</a>
           <a className="nav-item" href="#media">Media Lab</a>
+          <a className="nav-item" href="#runtime">Runtime</a>
         </nav>
 
         <div className="sidebar__footer">
@@ -252,6 +257,11 @@ export const App: React.FC = () => {
           <Metric label="RUNS" value={runs.length} detail={`${completedRuns} completed`} />
           <Metric label="THEMES" value={catalog.themes.length} detail="runtime brand packs" />
           <Metric label="ASSETS" value={mediaAssets.length} detail="generated media" />
+          <Metric
+            label="RUNTIME"
+            value={runtime?.profile ?? health?.runtimeProfile ?? 'local'}
+            detail={runtime?.production ? 'production profile' : 'non-production profile'}
+          />
         </section>
 
         <section id="projects" className="grid-section">
@@ -403,6 +413,52 @@ export const App: React.FC = () => {
                 </div>
               </article>
             ))}
+          </div>
+        </section>
+
+
+        <section id="runtime" className="grid-section">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">EXTERNAL RUNTIME / VS-G10</span>
+              <h3>Provider health</h3>
+            </div>
+          </div>
+          <div className="project-grid">
+            {(['worker', 'store'] as const).map((key) => {
+              const service = runtime?.services[key];
+              return (
+                <article className="project-card" key={key}>
+                  <div className="project-card__meta">
+                    <span>{key}</span>
+                    <span>{runtime?.profile ?? 'local'}</span>
+                  </div>
+                  <h4>{service?.status ?? 'unknown'}</h4>
+                  <p>
+                    {service?.error ??
+                      (service?.status === 'available'
+                        ? 'Remote provider reachable'
+                        : service?.status === 'local'
+                          ? 'Using local provider'
+                          : 'No runtime observation yet')}
+                  </p>
+                  <div className="project-card__output">
+                    <strong>
+                      {service?.circuit?.state
+                        ? `circuit ${service.circuit.state}`
+                        : 'no circuit activity'}
+                    </strong>
+                    <span>
+                      {service?.circuit
+                        ? `${service.circuit.failures} failures`
+                        : runtime?.production
+                          ? 'production runtime'
+                          : 'local / CI runtime'}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
 
