@@ -211,3 +211,53 @@ The next production-oriented extension is **VS-G09 — Operational Persistence &
 - audit events;
 - provider credential references without secrets in manifests;
 - Control Plane operational state surviving process restarts.
+
+
+## VS-G09 — Operational Persistence & Access
+
+**Status: VERIFIED — merged through PR #22**
+
+Verified:
+
+- atomic operational persistence;
+- run records surviving store recreation;
+- persistent audit history;
+- viewer/operator/admin role ordering;
+- explicit local-development access mode;
+- runtime bearer-token access provider;
+- 401 for missing/invalid credentials;
+- 403 for insufficient role;
+- viewer read access;
+- operator mutation access;
+- admin audit access;
+- denied-request audit evidence;
+- Control Plane bearer-token client support;
+- credential-reference contract that rejects raw secret-shaped values;
+- VS-G01 through VS-G08 regression pipeline remains green.
+
+Reference run:
+
+`36321544133`
+
+Artifact:
+
+- ID: `10931933770`;
+- size: `17,718,017 bytes`;
+- digest: `sha256:6fbe25e70ed268074b67061a17c28ebb72750085c57fcf555294e8611ef8bb4d`.
+
+See `docs/vs-g09-evidence.md`.
+
+## Next extension gate
+
+**VS-G10 — External Provider Runtime**
+
+Candidate scope:
+
+- concrete remote render-worker adapter;
+- durable external operational-store adapter;
+- runtime secret resolver;
+- provider health/capability discovery;
+- retry/backoff/circuit-breaker policy;
+- deployment profile separating local, CI and production operation.
+
+The neutral project manifest remains unchanged.

@@ -190,6 +190,36 @@ npm run render:ai-media
 npm run verify:ai-media
 ```
 
+## Operational persistence and access
+
+The Control Plane supports two explicit access modes:
+
+- **development** — local trusted mode with an injected admin principal;
+- **required** — bearer-token authentication supplied at runtime.
+
+Roles:
+
+- `viewer` — read catalog, runs and media history;
+- `operator` — viewer capabilities plus project/media/render mutations;
+- `admin` — operator capabilities plus audit access.
+
+Enable protected mode with a runtime environment variable:
+
+```text
+VIDEO_STUDIO_TOKENS_JSON
+```
+
+Its value is runtime configuration and must not be committed.
+
+Operational state and audit events are persisted outside project manifests. Provider credentials must be represented only by references such as:
+
+```text
+env:VIDEO_STUDIO_MEDIA_TOKEN
+secret:media/provider-token
+```
+
+Raw secret values are rejected by the credential-reference contract.
+
 ## Studios
 
 Remotion Studio:
@@ -236,6 +266,7 @@ The manifest remains the anti-lock-in boundary.
 - **VS-G06 — Scale:** VERIFIED
 - **VS-G07 — Control Plane:** VERIFIED
 - **VS-G08 — AI Media Adapters:** VERIFIED
+- **VS-G09 — Operational Persistence & Access:** VERIFIED
 
 The original foundation roadmap G01–G06 is now closed.
 
@@ -248,3 +279,4 @@ Reference evidence:
 - `docs/vs-g06-evidence.md`
 - `docs/vs-g07-evidence.md`
 - `docs/vs-g08-evidence.md`
+- `docs/vs-g09-evidence.md`

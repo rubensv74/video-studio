@@ -62,3 +62,13 @@
 | Provider-neutral HTTP media adapter | Media adapter | Verified boundary |
 | Control Plane Media Lab | `apps/control-plane` | Verified build/API |
 | Production AI provider | External provider adapter | Not bound to vendor |
+
+| Operational run persistence | Control Plane store | Verified |
+| Persistent audit history | Control Plane store | Verified |
+| Viewer/operator/admin RBAC | Access layer | Verified |
+| Bearer-token deployment mode | Access layer | Verified |
+| Explicit local-development access | Access layer | Verified |
+| Credential references | Access layer | Verified |
+| Admin audit API | Control Plane API | Verified |
+| Durable external database | Store adapter | Future provider |
+| External identity / OIDC | Access adapter | Future provider |

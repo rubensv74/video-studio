@@ -43,6 +43,7 @@ docs/dependency-baseline.md
 docs/gates.md
 docs/licensing.md
 docs/media-stack.md
+docs/operational-access.md
 docs/project-manifest.md
 docs/rendering.md
 docs/runner-diagnostic.md
@@ -53,6 +54,7 @@ docs/vs-g05-evidence.md
 docs/vs-g06-evidence.md
 docs/vs-g07-evidence.md
 docs/vs-g08-evidence.md
+docs/vs-g09-evidence.md
 fixtures/productization/data.json
 fixtures/productization/project.json
 output/.gitkeep
@@ -74,12 +76,14 @@ scripts/create-project.mjs
 scripts/extract-qa-frames.mjs
 scripts/generate-ai-media-fixtures.mjs
 scripts/generate-media-fixtures.mjs
+scripts/lib/access-control.mjs
 scripts/lib/batch-contract.mjs
 scripts/lib/control-plane-service.mjs
 scripts/lib/data-adapter.mjs
 scripts/lib/dependency-contract.mjs
 scripts/lib/manifest.mjs
 scripts/lib/media-provider.mjs
+scripts/lib/operational-store.mjs
 scripts/lib/queue-executor.mjs
 scripts/lib/render-cache.mjs
 scripts/lib/scaffold.mjs
@@ -93,6 +97,7 @@ scripts/render.mjs
 scripts/smoke-foundation.mjs
 scripts/test-ai-media.mjs
 scripts/test-control-plane.mjs
+scripts/test-operations-access.mjs
 scripts/test-productization.mjs
 scripts/test-scale.mjs
 scripts/validate-project.mjs
