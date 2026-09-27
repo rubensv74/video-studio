@@ -4,6 +4,7 @@ export type HealthResponse = {
   version: number;
   capabilities: string[];
   accessMode?: 'development' | 'required';
+  runtimeProfile?: string;
 };
 
 export type SessionResponse = {
