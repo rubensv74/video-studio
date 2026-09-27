@@ -47,7 +47,9 @@
     "verify:ai-media": "node scripts/verify-ai-media-demo.mjs",
     "test:operations-access": "node scripts/test-operations-access.mjs",
     "test:external-runtime": "node scripts/test-external-runtime.mjs",
-    "test:cloud-binding": "node scripts/test-concrete-cloud.mjs"
+    "test:cloud-binding": "node scripts/test-concrete-cloud.mjs",
+    "serve:worker": "node scripts/worker-server.mjs",
+    "test:cloud-runtime": "node scripts/test-cloud-runtime.mjs"
   },
   "engines": {
     "node": ">=20"
