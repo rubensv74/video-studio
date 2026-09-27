@@ -76,7 +76,7 @@ export type MediaStack = {
 
 export type DerivativeOutput = {
   id: string;
-  format: 'webm' | 'gif';
+  format: 'webm' | 'gif' | 'png-sequence';
   file: string;
   fps?: number;
   width?: number;

@@ -76,6 +76,13 @@
       "file": "output/remotion-demo.gif",
       "fps": 12,
       "width": 640
+    },
+    {
+      "id": "png-sequence",
+      "format": "png-sequence",
+      "file": "output/frames/frame-%04d.png",
+      "fps": 1,
+      "width": 640
     }
   ],
   "audioNormalization": {
@@ -107,7 +114,14 @@
       "type": "capability-grid",
       "durationSeconds": 5,
       "payload": {
-        "items": ["UI demos", "Technical diagrams", "Data-driven scenes", "Audio + captions", "WebGL / 3D", "Batch rendering"]
+        "items": [
+          "UI demos",
+          "Technical diagrams",
+          "Data-driven scenes",
+          "Audio + captions",
+          "WebGL / 3D",
+          "Batch rendering"
+        ]
       }
     },
     {

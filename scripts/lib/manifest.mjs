@@ -208,14 +208,25 @@ export const validateProject = (project) => {
       errors.push(`derivative.id must be unique: ${derivative.id}`);
     }
     derivativeIds.add(derivative.id);
-    if (!['webm', 'gif'].includes(derivative.format)) {
-      errors.push(`derivative ${derivative.id || '?'} format must be webm or gif`);
+    if (!['webm', 'gif', 'png-sequence'].includes(derivative.format)) {
+      errors.push(`derivative ${derivative.id || '?'} format must be webm, gif or png-sequence`);
     }
     if (!nonEmpty(derivative.file)) {
       errors.push(`derivative ${derivative.id || '?'} file is required`);
-    } else if (!derivative.file.toLowerCase().endsWith(`.${derivative.format}`)) {
+    } else if (
+      derivative.format !== 'png-sequence' &&
+      !derivative.file.toLowerCase().endsWith(`.${derivative.format}`)
+    ) {
       errors.push(
         `derivative ${derivative.id || '?'} file must end in .${derivative.format}`,
+      );
+    } else if (
+      derivative.format === 'png-sequence' &&
+      (!derivative.file.toLowerCase().endsWith('.png') ||
+        !/%0?\d*d/.test(derivative.file))
+    ) {
+      errors.push(
+        `derivative ${derivative.id || '?'} png-sequence file must be a numbered .png pattern`,
       );
     }
     if (derivative.fps !== undefined && !positiveInt(derivative.fps)) {

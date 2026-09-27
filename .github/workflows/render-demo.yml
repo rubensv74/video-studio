@@ -76,4 +76,5 @@ jobs:
             output/remotion-demo.webm
             output/remotion-demo.gif
             output/remotion-demo-normalized.mp4
+            output/frames/*.png
             package-lock.json

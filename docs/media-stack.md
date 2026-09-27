@@ -33,6 +33,7 @@ Generated fixture binaries are ignored by Git.
 
 - VP9/Opus WebM;
 - GIF preview;
+- numbered PNG image sequence;
 - audio-normalized MP4.
 
 The normalization target is project-configurable. The reference project uses -16 LUFS, -1.5 dB true peak and LRA 11 for the technical validation fixture.

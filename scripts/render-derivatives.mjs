@@ -66,6 +66,18 @@ for (const derivative of project.derivatives ?? []) {
     ]);
     continue;
   }
+  if (derivative.format === 'png-sequence') {
+    const fps = Number(derivative.fps ?? 1);
+    const width = Number(derivative.width ?? project.output.width);
+    run(derivative.id, [
+      '-i',
+      input,
+      '-vf',
+      `fps=${fps},scale=${width}:-1:flags=lanczos`,
+      output,
+    ]);
+    continue;
+  }
 
   console.error(`FAIL unsupported derivative format: ${derivative.format}`);
   process.exit(2);

@@ -30,7 +30,7 @@ assert.equal(plan.outputFile, path.resolve('output/remotion-demo.mp4'));
 assert.equal(project.media?.audioTracks?.length, 2);
 assert.equal(project.media?.videoTracks?.length, 1);
 assert.equal(project.media?.captionTracks?.length, 1);
-assert.equal(project.derivatives?.length, 2);
+assert.equal(project.derivatives?.length, 3);
 assert.equal(project.audioNormalization?.enabled, true);
 
 const rootSource = fs.readFileSync(path.join(root, 'apps/remotion-studio/src/Root.tsx'), 'utf8');

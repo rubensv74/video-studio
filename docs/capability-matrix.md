@@ -23,7 +23,7 @@
 | GIF | FFmpeg derivative | VS-G03 implementation |
 | Loudness normalization | FFmpeg loudnorm | VS-G03 implementation |
 | Stills | Remotion / Motion Canvas | Architecture ready |
-| Image sequence | Motion Canvas / Remotion | Architecture ready |
+| Image sequence | FFmpeg derivative / Remotion source | VS-G03 implementation |
 | Local headless render | Remotion | Verified |
 | CI render | Remotion | Verified |
 | Motion Canvas headless CI | None | Blocked upstream / not foundational |

@@ -62,6 +62,39 @@ for (const derivative of project.derivatives ?? []) {
     failures.push(`${derivative.id} expected gif; found ${video?.codec_name}`);
   }
 
+  if (derivative.format === 'png-sequence') {
+    const directory = path.dirname(path.resolve(derivative.file));
+    const basename = path.basename(derivative.file);
+    const token = basename.match(/%0?(\d*)d/);
+    const width = token?.[1] ? Number(token[1]) : null;
+    const prefix = basename.slice(0, token?.index ?? 0);
+    const suffix = token ? basename.slice((token.index ?? 0) + token[0].length) : '.png';
+    const frames = fs.existsSync(directory)
+      ? fs
+          .readdirSync(directory)
+          .filter((name) =>
+            name.startsWith(prefix) &&
+            name.endsWith(suffix) &&
+            (width === null ||
+              name.slice(prefix.length, name.length - suffix.length).length === width),
+          )
+          .sort()
+      : [];
+
+    if (frames.length === 0) {
+      failures.push(`${derivative.id} produced no PNG frames`);
+    } else {
+      const first = probe(path.join(directory, frames[0]));
+      const firstVideo = first.streams?.find((s) => s.codec_type === 'video');
+      if (firstVideo?.codec_name !== 'png') {
+        failures.push(`${derivative.id} expected png frames; found ${firstVideo?.codec_name}`);
+      } else {
+        console.log(`PASS derivative ${derivative.id}: ${frames.length} PNG frames`);
+      }
+    }
+    continue;
+  }
+
   console.log(`PASS derivative ${derivative.id}: ${video?.codec_name ?? 'no-video'}`);
 }
 
