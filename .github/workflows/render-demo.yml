@@ -68,6 +68,14 @@ jobs:
         run: npm run render:derivatives -- projects/demo-product/project.json
       - name: Verify media stack
         run: npm run verify:media-stack -- projects/demo-product/project.json
+      - name: Render advanced visuals
+        run: npm run render:advanced
+      - name: Verify advanced visuals
+        run: npm run verify:render -- projects/advanced-visuals-demo/project.json
+      - name: Extract advanced QA frames
+        run: npm run extract:advanced-qa
+      - name: Verify advanced QA frames
+        run: npm run verify:advanced-qa
       - uses: actions/upload-artifact@v4
         with:
           name: video-studio-demo
@@ -77,4 +85,6 @@ jobs:
             output/remotion-demo.gif
             output/remotion-demo-normalized.mp4
             output/frames/*.png
+            output/advanced-visuals-demo.mp4
+            output/advanced-visuals-qa/*.png
             package-lock.json

@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "id": "advanced-visuals-demo",
+  "title": "Video Studio — Advanced Visuals Demo",
+  "engine": "remotion",
+  "compositionId": "AdvancedVisualsDemo",
+  "theme": "default-dark",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "mp4",
+    "file": "output/advanced-visuals-demo.mp4"
+  },
+  "scenes": [
+    {
+      "id": "svg-flow",
+      "type": "svg-system-flow",
+      "durationSeconds": 3
+    },
+    {
+      "id": "canvas-telemetry",
+      "type": "canvas-telemetry",
+      "durationSeconds": 3
+    },
+    {
+      "id": "three-asset",
+      "type": "three-asset",
+      "durationSeconds": 3
+    }
+  ]
+}
