@@ -5,11 +5,13 @@ import type {
   AudioTrack,
   CaptionCue,
   CaptionTrack,
+  ImageTrack,
   MediaStack,
   VideoTrack,
 } from '@video-studio/contracts';
 import {
   AbsoluteFill,
+  Img,
   cancelRender,
   continueRender,
   delayRender,
@@ -23,6 +25,34 @@ const secondsToFrames = (seconds: number | undefined, fps: number) =>
 
 const resolveMediaSource = (src: string) =>
   /^(https?:|data:|blob:)/i.test(src) ? src : staticFile(src);
+
+const ImageTrackLayer: React.FC<{track: ImageTrack}> = ({track}) => {
+  const {fps, width, height} = useVideoConfig();
+  const frame = useCurrentFrame();
+  if (track.enabled === false) return null;
+
+  const start = secondsToFrames(track.startSeconds ?? 0, fps) ?? 0;
+  const duration = secondsToFrames(track.durationSeconds, fps);
+  const end = duration === undefined ? Number.POSITIVE_INFINITY : start + duration;
+  if (frame < start || frame >= end) return null;
+
+  const layout = track.layout ?? {};
+  return (
+    <Img
+      src={resolveMediaSource(track.src)}
+      style={{
+        position: 'absolute',
+        left: layout.x ?? 0,
+        top: layout.y ?? 0,
+        width: layout.width ?? width,
+        height: layout.height ?? height,
+        objectFit: track.objectFit ?? 'cover',
+        opacity: track.opacity ?? 1,
+        borderRadius: layout.borderRadius ?? 0,
+      }}
+    />
+  );
+};
 
 const AudioTrackLayer: React.FC<{track: AudioTrack}> = ({track}) => {
   const {fps} = useVideoConfig();
@@ -161,6 +191,9 @@ export const MediaLayer: React.FC<{media?: MediaStack}> = ({media}) => {
 
   return (
     <>
+      {(media.imageTracks ?? []).map((track) => (
+        <ImageTrackLayer key={track.id} track={track} />
+      ))}
       {(media.videoTracks ?? []).map((track) => (
         <VideoTrackLayer key={track.id} track={track} />
       ))}
