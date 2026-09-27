@@ -39,6 +39,7 @@ export const App: React.FC = () => {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [apiKey, setApiKey] = useState(controlPlaneApi.getApiKey());
   const [form, setForm] = useState({
     id: 'product-video',
     title: 'Product Video',
@@ -49,12 +50,13 @@ export const App: React.FC = () => {
   const refresh = async () => {
     try {
       setError(null);
-      const [healthData, catalogData, runsData] = await Promise.all([
-        controlPlaneApi.health(),
+      const healthData = await controlPlaneApi.health();
+      setHealth(healthData);
+
+      const [catalogData, runsData] = await Promise.all([
         controlPlaneApi.catalog(),
         controlPlaneApi.runs(),
       ]);
-      setHealth(healthData);
       setCatalog(catalogData);
       setRuns(runsData.runs);
       setForm((current) => ({
@@ -81,6 +83,11 @@ export const App: React.FC = () => {
     () => runs.filter((run) => ['success', 'cached', 'completed'].includes(run.status)).length,
     [runs],
   );
+
+  const applyApiKey = () => {
+    controlPlaneApi.setApiKey(apiKey);
+    void refresh();
+  };
 
   const createProject = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -140,9 +147,36 @@ export const App: React.FC = () => {
             <span className="eyebrow">PROGRAMMATIC VIDEO PLATFORM</span>
             <h1>Render operations</h1>
           </div>
-          <button className="button button--ghost" onClick={() => void refresh()}>
-            Refresh
-          </button>
+          <div className="topbar__actions">
+            {health?.auth.enabled ? (
+              <div className="api-key-control">
+                <input
+                  aria-label="Control Plane API key"
+                  type="password"
+                  value={apiKey}
+                  onChange={(event) => setApiKey(event.target.value)}
+                  placeholder="API key"
+                  autoComplete="off"
+                />
+                <button
+                  className="button button--ghost"
+                  type="button"
+                  onClick={applyApiKey}
+                >
+                  Apply key
+                </button>
+              </div>
+            ) : (
+              <span className="local-auth-badge">LOCAL AUTH OFF</span>
+            )}
+            <button
+              className="button button--ghost"
+              type="button"
+              onClick={() => void refresh()}
+            >
+              Refresh
+            </button>
+          </div>
         </header>
 
         {error && <div className="error-banner">{error}</div>}
