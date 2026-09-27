@@ -16,7 +16,7 @@
     "imageTracks": [
       {
         "id": "generated-image",
-        "src": "generated-media/image-7b5b93088ef7.svg",
+        "src": "generated-media/ai-image.svg",
         "startSeconds": 0,
         "durationSeconds": 8,
         "opacity": 0.26,
@@ -34,7 +34,7 @@
       {
         "id": "generated-tts",
         "role": "voiceover",
-        "src": "generated-media/tts-c97742390e3c.wav",
+        "src": "generated-media/ai-voice.wav",
         "startSeconds": 0,
         "volume": 0.9
       }
@@ -42,7 +42,7 @@
     "captionTracks": [
       {
         "id": "generated-transcript",
-        "src": "generated-media/transcript-ce8ce941e8ba.srt",
+        "src": "generated-media/ai-captions.srt",
         "format": "srt",
         "startSeconds": 0
       }
