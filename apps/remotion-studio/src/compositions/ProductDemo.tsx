@@ -13,6 +13,8 @@ import {videoTheme} from '@video-studio/design-system';
 import {BlueprintGrid} from '../components/BlueprintGrid';
 import {GlassCard} from '../components/GlassCard';
 import {MediaLayer} from '../components/MediaLayer';
+import {createSceneRegistry} from '../components/SceneRegistry';
+import {SceneTransition} from '../components/SceneTransition';
 
 const defaultCapabilities = [
   'UI demos',
@@ -257,12 +259,14 @@ const GenericScene: React.FC<{scene: VideoScene}> = ({scene}) => (
   </Stage>
 );
 
-const SceneRenderer: React.FC<{scene: VideoScene}> = ({scene}) => {
-  if (scene.type === 'hero') return <Intro scene={scene} />;
-  if (scene.type === 'capability-grid') return <CapabilityGrid scene={scene} />;
-  if (scene.type === 'outro') return <Outro scene={scene} />;
-  return <GenericScene scene={scene} />;
-};
+const SceneRenderer = createSceneRegistry(
+  {
+    hero: Intro,
+    'capability-grid': CapabilityGrid,
+    outro: Outro,
+  },
+  GenericScene,
+);
 
 export const ProductDemo: React.FC<VideoProjectManifest> = (project) => {
   let from = 0;
@@ -283,7 +287,9 @@ export const ProductDemo: React.FC<VideoProjectManifest> = (project) => {
             from={start}
             durationInFrames={durationInFrames}
           >
-            <SceneRenderer scene={scene} />
+            <SceneTransition durationInFrames={durationInFrames}>
+              <SceneRenderer scene={scene} />
+            </SceneTransition>
           </Sequence>
         );
       })}
