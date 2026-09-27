@@ -1,9 +1,9 @@
 -- Video Studio operational store for Supabase.
--- This schema is server-side only. Add "video_studio_api" to the project's
--- Data API exposed schemas before using the PostgREST adapter.
+-- This schema is server-side only.
 --
 -- Security model:
 --   * RLS is enabled on every exposed table.
+--   * Explicit deny policies exist for anon/authenticated.
 --   * PUBLIC, anon and authenticated receive no schema/table/sequence access.
 --   * service_role is granted only the operations required by the server.
 --   * No client/browser key should ever be used with this schema.
@@ -37,6 +37,24 @@ create index if not exists audit_events_created_at_idx
 
 alter table video_studio_api.runs enable row level security;
 alter table video_studio_api.audit_events enable row level security;
+
+drop policy if exists deny_client_access_runs
+  on video_studio_api.runs;
+create policy deny_client_access_runs
+on video_studio_api.runs
+for all
+to anon, authenticated
+using (false)
+with check (false);
+
+drop policy if exists deny_client_access_audit_events
+  on video_studio_api.audit_events;
+create policy deny_client_access_audit_events
+on video_studio_api.audit_events
+for all
+to anon, authenticated
+using (false)
+with check (false);
 
 revoke all on all tables in schema video_studio_api from public;
 revoke all on all tables in schema video_studio_api from anon;
