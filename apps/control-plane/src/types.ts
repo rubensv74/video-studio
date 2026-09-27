@@ -90,3 +90,25 @@ export type MediaAssetSummary = {
 export type MediaHistoryResponse = {
   assets: MediaAssetSummary[];
 };
+
+export type RuntimeServiceStatus = {
+  status: 'local' | 'available' | 'unavailable';
+  health?: Record<string, unknown>;
+  capabilities?: Record<string, unknown> | null;
+  circuit?: {
+    state: string;
+    failures: number;
+    failureThreshold: number;
+    resetTimeoutMs: number;
+  } | null;
+  error?: string;
+};
+
+export type RuntimeDiagnosticsResponse = {
+  profile: 'local' | 'ci' | 'production' | string;
+  production: boolean;
+  services: {
+    worker: RuntimeServiceStatus;
+    store: RuntimeServiceStatus;
+  };
+};
