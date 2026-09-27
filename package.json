@@ -30,7 +30,8 @@
     "fixtures:media": "node scripts/generate-media-fixtures.mjs",
     "render:derivatives": "node scripts/render-derivatives.mjs",
     "verify:media-stack": "node scripts/verify-media-stack.mjs",
-    "render:productization": "node scripts/render-productization-fixtures.mjs"
+    "render:productization": "node scripts/render-productization-fixtures.mjs",
+    "verify:runtime-theme": "node scripts/verify-theme-render.mjs"
   },
   "engines": {
     "node": ">=20"
