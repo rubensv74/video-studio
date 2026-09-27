@@ -106,6 +106,10 @@ export const createControlPlaneService = ({
   workerRuntime,
   runtimeProfile,
   runtimeDiagnosticsProvider,
+  allowedOrigins = String(process.env.VIDEO_STUDIO_ALLOWED_ORIGINS ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean),
 } = {}) => {
   const absoluteRoot = path.resolve(root);
   const absoluteProjectRoot = path.resolve(absoluteRoot, projectRoot);
@@ -387,6 +391,33 @@ export const createControlPlaneService = ({
 
   const handler = async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://localhost');
+    const origin =
+      typeof request.headers?.origin === 'string'
+        ? request.headers.origin
+        : null;
+
+    if (origin && allowedOrigins.length > 0) {
+      if (!allowedOrigins.includes(origin)) {
+        json(response, 403, {error: 'Origin is not allowed'});
+        return;
+      }
+      response.setHeader('access-control-allow-origin', origin);
+      response.setHeader('vary', 'Origin');
+      response.setHeader(
+        'access-control-allow-headers',
+        'authorization, content-type',
+      );
+      response.setHeader(
+        'access-control-allow-methods',
+        'GET, POST, OPTIONS',
+      );
+    }
+
+    if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/')) {
+      response.writeHead(204, {'cache-control': 'no-store'});
+      response.end();
+      return;
+    }
 
     try {
       if (request.method === 'GET' && url.pathname === '/api/health') {
@@ -561,6 +592,7 @@ export const createControlPlaneService = ({
     runtimeProfile: profile,
     runtimeDiagnostics: diagnostics,
     workerRuntime,
+    allowedOrigins: [...allowedOrigins],
   };
 };
 
