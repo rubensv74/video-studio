@@ -12,9 +12,13 @@ apps/motion-canvas-studio/vite.config.ts
 apps/remotion-studio/package.json
 apps/remotion-studio/remotion.config.ts
 apps/remotion-studio/src/Root.tsx
+apps/remotion-studio/src/components/AdvancedCanvasTelemetry.tsx
+apps/remotion-studio/src/components/AdvancedSvgSystem.tsx
+apps/remotion-studio/src/components/AdvancedThreeAsset.tsx
 apps/remotion-studio/src/components/BlueprintGrid.tsx
 apps/remotion-studio/src/components/GlassCard.tsx
 apps/remotion-studio/src/components/MediaLayer.tsx
+apps/remotion-studio/src/compositions/AdvancedVisualsDemo.tsx
 apps/remotion-studio/src/compositions/ProductDemo.tsx
 apps/remotion-studio/src/index.ts
 apps/remotion-studio/tsconfig.json
@@ -30,6 +34,7 @@ docs/rendering.md
 docs/runner-diagnostic.md
 docs/vs-g02-evidence.md
 docs/vs-g03-evidence.md
+docs/vs-g04-evidence.md
 output/.gitkeep
 package-lock.json
 package.json
@@ -37,10 +42,12 @@ packages/contracts/package.json
 packages/contracts/src/index.ts
 packages/design-system/package.json
 packages/design-system/src/index.ts
+projects/advanced-visuals-demo/project.json
 projects/demo-product/project.json
 scripts/bootstrap-unix.sh
 scripts/bootstrap-windows.ps1
 scripts/check-env.mjs
+scripts/extract-qa-frames.mjs
 scripts/generate-media-fixtures.mjs
 scripts/lib/dependency-contract.mjs
 scripts/lib/manifest.mjs
@@ -52,4 +59,5 @@ scripts/smoke-foundation.mjs
 scripts/validate-project.mjs
 scripts/verify-dependency-contract.mjs
 scripts/verify-media-stack.mjs
+scripts/verify-qa-frames.mjs
 scripts/verify-render.mjs
