@@ -16,6 +16,12 @@ import {
   writeProject,
 } from './scaffold.mjs';
 import {createFixtureMediaProvider} from './media-provider.mjs';
+import {
+  AccessError,
+  createAccessProviderFromEnv,
+  requireRole,
+} from './access-control.mjs';
+import {createOperationalStore} from './operational-store.mjs';
 
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -93,12 +99,20 @@ export const createControlPlaneService = ({
   projectRoot = 'projects',
   distDir = 'apps/control-plane/dist',
   mediaProvider,
+  accessProvider,
+  operationalStore,
 } = {}) => {
   const absoluteRoot = path.resolve(root);
   const absoluteProjectRoot = path.resolve(absoluteRoot, projectRoot);
   const absoluteDist = path.resolve(absoluteRoot, distDir);
   const liveRuns = new Map();
   let runCounter = 0;
+  const access = accessProvider ?? createAccessProviderFromEnv();
+  const store =
+    operationalStore ??
+    createOperationalStore({
+      file: path.join(absoluteRoot, 'output/operations/store.json'),
+    });
   const media =
     mediaProvider ??
     createFixtureMediaProvider({
@@ -174,12 +188,45 @@ export const createControlPlaneService = ({
       });
 
   const runs = () => {
-    const live = [...liveRuns.values()];
-    return [...live, ...reportRuns()].sort((a, b) =>
+    const combined = [
+      ...store.listRuns(),
+      ...liveRuns.values(),
+      ...reportRuns(),
+    ];
+    const byId = new Map();
+    for (const item of combined) byId.set(item.id, item);
+    return [...byId.values()].sort((a, b) =>
       String(b.startedAt ?? b.completedAt ?? '').localeCompare(
         String(a.startedAt ?? a.completedAt ?? ''),
       ),
     );
+  };
+
+  const authorize = async (request, requiredRole, action) => {
+    const principal = await access.authenticate(request);
+    try {
+      requireRole(principal, requiredRole);
+      store.appendAudit({
+        action,
+        method: request.method,
+        outcome: 'allowed',
+        subject: principal.subject,
+        role: principal.role,
+        provider: principal.provider,
+      });
+      return principal;
+    } catch (error) {
+      store.appendAudit({
+        action,
+        method: request.method,
+        outcome: 'denied',
+        subject: principal?.subject ?? null,
+        role: principal?.role ?? null,
+        provider: principal?.provider ?? access.mode,
+        reason: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   };
 
   const validateRenderTarget = ({kind, requested}) => {
@@ -226,6 +273,7 @@ export const createControlPlaneService = ({
       exitCode: null,
     };
     liveRuns.set(id, record);
+    store.upsertRun(record);
 
     const child = spawn(process.execPath, [script, target], {
       cwd: absoluteRoot,
@@ -234,22 +282,26 @@ export const createControlPlaneService = ({
     });
 
     child.on('error', (error) => {
-      liveRuns.set(id, {
+      const failed = {
         ...record,
         status: 'failed',
         completedAt: new Date().toISOString(),
         error: error.message,
         exitCode: -1,
-      });
+      };
+      liveRuns.set(id, failed);
+      store.upsertRun(failed);
     });
 
     child.on('exit', (code) => {
-      liveRuns.set(id, {
+      const completed = {
         ...record,
         status: code === 0 ? 'success' : 'failed',
         completedAt: new Date().toISOString(),
         exitCode: code,
-      });
+      };
+      liveRuns.set(id, completed);
+      store.upsertRun(completed);
     });
 
     return {id};
@@ -302,27 +354,52 @@ export const createControlPlaneService = ({
             'cache-aware-scale-layer',
             'media-generation',
             'media-history',
+            'operational-persistence',
+            'role-based-access',
+            'audit-history',
           ],
+          accessMode: access.mode,
         });
         return;
       }
 
+      if (request.method === 'GET' && url.pathname === '/api/session') {
+        const principal = await authorize(request, 'viewer', 'session.read');
+        json(response, 200, {
+          subject: principal.subject,
+          role: principal.role,
+          provider: principal.provider,
+          accessMode: access.mode,
+        });
+        return;
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/audit') {
+        await authorize(request, 'admin', 'audit.read');
+        json(response, 200, {events: store.listAudit()});
+        return;
+      }
+
       if (request.method === 'GET' && url.pathname === '/api/catalog') {
+        await authorize(request, 'viewer', 'catalog.read');
         json(response, 200, catalog());
         return;
       }
 
       if (request.method === 'GET' && url.pathname === '/api/runs') {
+        await authorize(request, 'viewer', 'runs.read');
         json(response, 200, {runs: runs()});
         return;
       }
 
       if (request.method === 'GET' && url.pathname === '/api/media') {
+        await authorize(request, 'viewer', 'media.read');
         json(response, 200, {assets: media.listAssets?.() ?? []});
         return;
       }
 
       if (request.method === 'POST' && url.pathname === '/api/media') {
+        await authorize(request, 'operator', 'media.create');
         const body = await readBody(request);
         let asset;
 
@@ -351,6 +428,7 @@ export const createControlPlaneService = ({
       }
 
       if (request.method === 'POST' && url.pathname === '/api/projects') {
+        await authorize(request, 'operator', 'projects.create');
         const body = await readBody(request);
         const result = writeProject({
           id: body.id,
@@ -371,6 +449,7 @@ export const createControlPlaneService = ({
       }
 
       if (request.method === 'POST' && url.pathname === '/api/renders') {
+        await authorize(request, 'operator', 'renders.create');
         const body = await readBody(request);
         const target = validateRenderTarget({
           kind: body.kind,
@@ -398,7 +477,11 @@ export const createControlPlaneService = ({
 
       serveStatic(request, response);
     } catch (error) {
-      json(response, 400, {
+      const status =
+        error instanceof AccessError
+          ? error.statusCode
+          : Number(error?.statusCode) || 400;
+      json(response, status, {
         error: error instanceof Error ? error.message : String(error),
       });
     }
@@ -409,6 +492,8 @@ export const createControlPlaneService = ({
     catalog,
     runs,
     validateRenderTarget,
+    operationalStore: store,
+    accessMode: access.mode,
   };
 };
 
