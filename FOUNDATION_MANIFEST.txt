@@ -3,6 +3,15 @@
 .github/workflows/runner-diagnostic.yml
 .gitignore
 README.md
+apps/control-plane/index.html
+apps/control-plane/package.json
+apps/control-plane/src/App.tsx
+apps/control-plane/src/api.ts
+apps/control-plane/src/main.tsx
+apps/control-plane/src/styles.css
+apps/control-plane/src/types.ts
+apps/control-plane/tsconfig.json
+apps/control-plane/vite.config.ts
 apps/motion-canvas-studio/package.json
 apps/motion-canvas-studio/src/motion-canvas.d.ts
 apps/motion-canvas-studio/src/project.ts
@@ -41,6 +50,7 @@ docs/vs-g03-evidence.md
 docs/vs-g04-evidence.md
 docs/vs-g05-evidence.md
 docs/vs-g06-evidence.md
+docs/vs-g07-evidence.md
 fixtures/productization/data.json
 fixtures/productization/project.json
 output/.gitkeep
@@ -56,10 +66,12 @@ projects/demo-product/project.json
 scripts/bootstrap-unix.sh
 scripts/bootstrap-windows.ps1
 scripts/check-env.mjs
+scripts/control-plane-server.mjs
 scripts/create-project.mjs
 scripts/extract-qa-frames.mjs
 scripts/generate-media-fixtures.mjs
 scripts/lib/batch-contract.mjs
+scripts/lib/control-plane-service.mjs
 scripts/lib/data-adapter.mjs
 scripts/lib/dependency-contract.mjs
 scripts/lib/manifest.mjs
@@ -74,6 +86,7 @@ scripts/render-derivatives.mjs
 scripts/render-productization-fixtures.mjs
 scripts/render.mjs
 scripts/smoke-foundation.mjs
+scripts/test-control-plane.mjs
 scripts/test-productization.mjs
 scripts/test-scale.mjs
 scripts/validate-project.mjs

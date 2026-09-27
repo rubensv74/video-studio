@@ -158,6 +158,42 @@ Two worker adapters are defined:
 
 The external boundary is verified with a deterministic HTTP test, but no concrete cloud provider is mandatory.
 
+## Control Plane layer
+
+The Control Plane is an operational surface above the verified engine; it is not a replacement for the rendering contracts.
+
+```text
+React Control Plane
+      |
+      v
+HTTP API
+      |
+      +-------------------+-------------------+
+      |                   |                   |
+      v                   v                   v
+Project Catalog      Project Scaffolder   Run History
+      |                   |                   |
+      +-------------------+-------------------+
+                          |
+                          v
+                 Validated Submission
+                          |
+                  +-------+-------+
+                  |               |
+                  v               v
+             Single Render     Batch Render
+                  |               |
+                  +-------+-------+
+                          v
+                    Worker Layer
+```
+
+The browser never executes FFmpeg, npm or shell commands.
+
+The API constrains targets to approved repository roots, requires JSON contracts, validates manifests/batches, and launches engine scripts with `shell: false`.
+
+This keeps UI deployment independent from future worker deployment. A later cloud control plane can replace only the API/worker transport while retaining manifests, batches and render contracts.
+
 ## Shared layers
 
 `packages/contracts` owns neutral TypeScript contracts.
