@@ -167,6 +167,29 @@ Verified API surfaces:
 
 The browser never invokes FFmpeg or a shell directly. Render requests are validated by the service and delegated to the existing renderer/batch layer using `spawn(..., shell: false)`.
 
+## AI Media Adapters
+
+Video Studio treats AI/media services as **asset producers**, not render engines.
+
+Verified provider-neutral surfaces:
+
+- image-generation contract;
+- TTS contract;
+- transcription contract;
+- generated-asset registry;
+- Control Plane Media Lab;
+- HTTP provider boundary.
+
+Local development uses deterministic fixture providers so CI is reproducible and credential-free. Real providers can be connected through the HTTP adapter without changing project manifests or Remotion code.
+
+Reference demo:
+
+```bash
+npm run fixtures:ai-media
+npm run render:ai-media
+npm run verify:ai-media
+```
+
 ## Studios
 
 Remotion Studio:
@@ -212,6 +235,7 @@ The manifest remains the anti-lock-in boundary.
 - **VS-G05 — Productization:** VERIFIED
 - **VS-G06 — Scale:** VERIFIED
 - **VS-G07 — Control Plane:** VERIFIED
+- **VS-G08 — AI Media Adapters:** VERIFIED
 
 The original foundation roadmap G01–G06 is now closed.
 
@@ -223,3 +247,4 @@ Reference evidence:
 - `docs/vs-g05-evidence.md`
 - `docs/vs-g06-evidence.md`
 - `docs/vs-g07-evidence.md`
+- `docs/vs-g08-evidence.md`

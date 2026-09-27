@@ -156,3 +156,58 @@ The verified Control Plane opens the next extension gates without changing the c
 - AI asset-generation adapters;
 - TTS and transcription providers;
 - organization-level governance and observability.
+
+
+## VS-G08 — AI Media Adapters
+
+**Status: VERIFIED — merged through PR #20**
+
+Verified:
+
+- provider-neutral image-generation contract;
+- provider-neutral TTS contract;
+- provider-neutral transcription contract;
+- deterministic local fixture provider;
+- provider-neutral HTTP media-provider boundary;
+- generated asset registry/history;
+- neutral image tracks in the normal media stack;
+- Control Plane `GET/POST /api/media`;
+- Control Plane Media Lab build;
+- physical Remotion render using generated image/audio/SRT assets;
+- generated-media QA frame and artifact retention;
+- VS-G01 through VS-G07 regressions remain green.
+
+Reference run:
+
+`36320838535`
+
+Evidence:
+
+```text
+PASS deterministic image/TTS/transcription provider contracts
+PASS generated asset registry
+PASS provider-neutral HTTP media boundary
+PASS control-plane media generation/history
+PASS AI media audio stream: aac
+PASS AI media QA frame: 486364 bytes
+PASS VS-G08 physical AI-media integration contract
+```
+
+Artifact:
+
+- ID: `10932552442`;
+- size: `17,715,802 bytes`;
+- digest: `sha256:204e045a8003add0a3795a0d3e2cbda0385c86c8a649217c8a5eea2d93fe7b6b`.
+
+See `docs/vs-g08-evidence.md`.
+
+## Next extension gate
+
+The next production-oriented extension is **VS-G09 — Operational Persistence & Access**:
+
+- persistent run/project/media metadata;
+- authentication boundary;
+- role-based authorization;
+- audit events;
+- provider credential references without secrets in manifests;
+- Control Plane operational state surviving process restarts.

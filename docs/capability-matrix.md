@@ -53,3 +53,12 @@
 | Path traversal protection | Control Plane service | Verified |
 | Shell-free process delegation | Node `spawn` boundary | Verified design + tests |
 | Run/report history | Control Plane service | Verified |
+
+| Generated image tracks | Neutral media stack | Verified physically in VS-G08 |
+| AI/media asset registry | Provider layer | Verified |
+| Image provider contract | Media adapter | Verified |
+| TTS provider contract | Media adapter | Verified |
+| Transcription provider contract | Media adapter | Verified |
+| Provider-neutral HTTP media adapter | Media adapter | Verified boundary |
+| Control Plane Media Lab | `apps/control-plane` | Verified build/API |
+| Production AI provider | External provider adapter | Not bound to vendor |

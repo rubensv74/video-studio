@@ -36,6 +36,7 @@ apps/remotion-studio/src/index.ts
 apps/remotion-studio/tsconfig.json
 assets/README.md
 batches/productization-ci.json
+docs/ai-media.md
 docs/architecture.md
 docs/capability-matrix.md
 docs/dependency-baseline.md
@@ -51,6 +52,7 @@ docs/vs-g04-evidence.md
 docs/vs-g05-evidence.md
 docs/vs-g06-evidence.md
 docs/vs-g07-evidence.md
+docs/vs-g08-evidence.md
 fixtures/productization/data.json
 fixtures/productization/project.json
 output/.gitkeep
@@ -62,6 +64,7 @@ packages/design-system/package.json
 packages/design-system/src/index.ts
 presets/video-presets.json
 projects/advanced-visuals-demo/project.json
+projects/ai-media-demo/project.json
 projects/demo-product/project.json
 scripts/bootstrap-unix.sh
 scripts/bootstrap-windows.ps1
@@ -69,12 +72,14 @@ scripts/check-env.mjs
 scripts/control-plane-server.mjs
 scripts/create-project.mjs
 scripts/extract-qa-frames.mjs
+scripts/generate-ai-media-fixtures.mjs
 scripts/generate-media-fixtures.mjs
 scripts/lib/batch-contract.mjs
 scripts/lib/control-plane-service.mjs
 scripts/lib/data-adapter.mjs
 scripts/lib/dependency-contract.mjs
 scripts/lib/manifest.mjs
+scripts/lib/media-provider.mjs
 scripts/lib/queue-executor.mjs
 scripts/lib/render-cache.mjs
 scripts/lib/scaffold.mjs
@@ -86,10 +91,12 @@ scripts/render-derivatives.mjs
 scripts/render-productization-fixtures.mjs
 scripts/render.mjs
 scripts/smoke-foundation.mjs
+scripts/test-ai-media.mjs
 scripts/test-control-plane.mjs
 scripts/test-productization.mjs
 scripts/test-scale.mjs
 scripts/validate-project.mjs
+scripts/verify-ai-media-demo.mjs
 scripts/verify-dependency-contract.mjs
 scripts/verify-media-stack.mjs
 scripts/verify-qa-frames.mjs
