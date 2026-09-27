@@ -76,6 +76,8 @@ jobs:
         run: npm run extract:advanced-qa
       - name: Verify advanced QA frames
         run: npm run verify:advanced-qa
+      - name: Render scaffolded product presets
+        run: npm run render:productization
       - uses: actions/upload-artifact@v7
         with:
           name: video-studio-demo
@@ -87,4 +89,5 @@ jobs:
             output/frames/*.png
             output/advanced-visuals-demo.mp4
             output/advanced-visuals-qa/*.png
+            output/productization/*.mp4
             package-lock.json
