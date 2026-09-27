@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "id": "productization-ci",
+  "concurrency": 1,
+  "cache": {
+    "enabled": true,
+    "directory": "output/scale/cache"
+  },
+  "retention": {
+    "days": 30
+  },
+  "worker": {
+    "type": "local"
+  },
+  "jobs": [
+    {
+      "id": "landscape",
+      "manifest": ".generated/productization/generated-landscape-16x9/project.json"
+    },
+    {
+      "id": "square",
+      "manifest": ".generated/productization/generated-square-1x1/project.json"
+    }
+  ]
+}

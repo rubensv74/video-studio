@@ -80,6 +80,12 @@ jobs:
         run: npm run render:productization
       - name: Verify runtime theme pack
         run: npm run verify:runtime-theme -- .generated/productization/generated-portrait-9x16/project.json
+      - name: Scale batch first execution
+        run: npm run render:batch -- batches/productization-ci.json --clear-cache --report output/scale/batch-first.json
+      - name: Scale batch cache replay
+        run: npm run render:batch -- batches/productization-ci.json --report output/scale/batch-second.json
+      - name: Verify scale reports
+        run: npm run verify:scale-report -- output/scale/batch-first.json output/scale/batch-second.json
       - uses: actions/upload-artifact@v7
         with:
           name: video-studio-demo
@@ -92,4 +98,6 @@ jobs:
             output/advanced-visuals-demo.mp4
             output/advanced-visuals-qa/*.png
             output/productization/*.mp4
+            output/scale/*.json
+            output/scale/cache/*.json
             package-lock.json

@@ -16,8 +16,9 @@
     "validate:demo": "node scripts/validate-project.mjs projects/demo-product/project.json",
     "validate:advanced": "node scripts/validate-project.mjs projects/advanced-visuals-demo/project.json",
     "test:productization": "node scripts/test-productization.mjs",
+    "test:scale": "node scripts/test-scale.mjs",
     "create:project": "node scripts/create-project.mjs",
-    "check": "node scripts/check-env.mjs && npm run smoke && npm run validate:advanced && npm run test:productization && npm run typecheck",
+    "check": "node scripts/check-env.mjs && npm run smoke && npm run validate:advanced && npm run test:productization && npm run test:scale && npm run typecheck",
     "probe": "node scripts/probe-media.mjs",
     "postprocess": "node scripts/postprocess.mjs",
     "render": "node scripts/render.mjs",
@@ -31,7 +32,9 @@
     "render:derivatives": "node scripts/render-derivatives.mjs",
     "verify:media-stack": "node scripts/verify-media-stack.mjs",
     "render:productization": "node scripts/render-productization-fixtures.mjs",
-    "verify:runtime-theme": "node scripts/verify-theme-render.mjs"
+    "verify:runtime-theme": "node scripts/verify-theme-render.mjs",
+    "render:batch": "node scripts/render-batch.mjs",
+    "verify:scale-report": "node scripts/verify-scale-report.mjs"
   },
   "engines": {
     "node": ">=20"
