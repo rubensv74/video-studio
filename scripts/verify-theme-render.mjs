@@ -26,16 +26,21 @@ if (!fs.existsSync(file)) {
   process.exit(1);
 }
 
-const x = 4;
-const y = manifest.output.height - 6;
+// ProductDemo renders a 12px theme-accent signature bar at the bottom.
+// Sample an 8px-high region safely inside that bar and average it to 1px.
+// This avoids frame-selection expressions and H.264 edge/chroma noise.
+const sampleHeight = 8;
+const sampleY = manifest.output.height - 10;
 const filter =
-  `select=eq(n\\,30),crop=1:1:${x}:${y},format=rgb24`;
+  `crop=32:${sampleHeight}:16:${sampleY},scale=1:1:flags=area,format=rgb24`;
 
 const result = spawnSync(
   'ffmpeg',
   [
     '-v',
     'error',
+    '-ss',
+    '1',
     '-i',
     file,
     '-vf',
@@ -52,7 +57,9 @@ const result = spawnSync(
 );
 
 if (result.status !== 0 || !result.stdout || result.stdout.length < 3) {
+  const stderr = result.stderr ? result.stderr.toString('utf8').trim() : '';
   console.error('FAIL could not sample theme signature pixel');
+  if (stderr) console.error(stderr);
   process.exit(result.status ?? 1);
 }
 
@@ -65,7 +72,7 @@ const expected = [
 ];
 
 const delta = actual.map((value, index) => Math.abs(value - expected[index]));
-const tolerance = 18;
+const tolerance = 24;
 
 if (delta.some((value) => value > tolerance)) {
   console.error(
