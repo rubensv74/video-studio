@@ -31,81 +31,85 @@ See `docs/vs-g02-evidence.md`.
 
 ## VS-G03 — Media stack
 
-**Status: VERIFIED — PR #5**
+**Status: VERIFIED — merged through PR #5**
 
-### Timed media tracks
+Verified:
 
-The neutral project manifest now supports:
-
-- voice-over;
-- music;
-- SFX;
-- ambient audio;
-- video clips;
+- timed audio tracks;
+- timed video track;
 - SRT captions;
-- inline caption cues.
-
-Track contracts include timeline placement and media-specific controls such as duration, trims, volume, looping, video fit/layout and caption styling.
-
-### Deterministic fixture strategy
-
-CI generates its own technical media:
-
-- AAC music tone;
-- AAC voice-over placeholder tone;
-- H.264 test clip;
-- SRT subtitle file.
-
-The fixture strategy proves routing, timing, decoding, mixing and caption ingestion without external services or copyrighted media.
-
-### Verified primary media
-
-The reference Remotion render passed with:
-
-- H.264 primary video;
-- AAC audio stream;
-- 48 kHz sample rate;
-- manifest-driven video overlay;
-- manifest-driven SRT captions.
-
-Independent visual QA extracted a frame at 4 s from the successful artifact and confirmed that the base scene, generated video clip and active SRT subtitle were visible simultaneously.
-
-### Verified derivatives
-
-CI verified:
-
-- WebM: VP9 video + Opus audio;
-- GIF: GIF codec;
-- PNG sequence: 10 numbered PNG frames at 640 px;
-- normalized MP4 with measured integrated loudness of **-15.98 LUFS** for a configured target of **-16 LUFS**.
-
-### Reference execution
-
-- workflow run: `36300093257`;
-- commit: `cde2c33b2bcfbb6f8a4d56fe230f8036ed4d11a6`;
-- artifact: `video-studio-demo`;
-- artifact ID: `10925034371`;
-- artifact ZIP digest:
-  `sha256:e96ad28413f630b5a1c70fbc1824d2b7594c179287d334b6b0fa755317abdaf8`.
+- WebM VP9/Opus;
+- GIF;
+- PNG sequence;
+- loudness-normalized MP4;
+- strict media-stack verification;
+- retained CI artifacts.
 
 See `docs/vs-g03-evidence.md`.
 
 ## VS-G04 — Advanced visuals
 
+**Status: VERIFIED — PR #9**
+
+### Physical rendering paths
+
+The independent `advanced-visuals-demo` composition proves three advanced paths in one H.264 render:
+
+1. animated SVG system-flow scene;
+2. deterministic HTML Canvas telemetry scene;
+3. Three.js / React Three Fiber / WebGL industrial-asset scene.
+
+The project remains manifest-driven through:
+
+```text
+projects/advanced-visuals-demo/project.json
+```
+
+### Specialist Motion Canvas path
+
+The Motion Canvas workspace remains inside the normal TypeScript gate and continues to provide the specialist authoring path for engineering diagrams. It is intentionally not required for CI-critical headless video rendering.
+
+### Verified media contract
+
+Reference run `36304477408` produced:
+
+- H.264 High profile;
+- 1920x1080;
+- 30 FPS;
+- 9.00 s duration;
+- physical render from Remotion 4.0.528.
+
+### Scene QA evidence
+
+CI extracts one midpoint PNG from each scene and verifies PNG codec, 1920x1080 geometry and non-trivial file size.
+
+Reference QA sizes:
+
+- `svg-flow.png`: 428,767 bytes;
+- `canvas-telemetry.png`: 732,439 bytes;
+- `three-asset.png`: 358,239 bytes.
+
+Artifact:
+
+- ID: `10926876837`;
+- size: `7,846,606 bytes`;
+- digest: `sha256:c2ddbf50401407f6128519a3a977bcb69805f3e7863cf376a3b45efcfd7786b0`.
+
+See `docs/vs-g04-evidence.md`.
+
+## VS-G05 — Productization
+
 **Status: NEXT**
 
 Add and verify:
 
-- reusable SVG motion primitives;
-- Canvas visual components;
-- engineering/architecture diagram scenes;
-- Three.js / React Three Fiber / WebGL scenes;
-- still-frame visual QA;
-- reusable transition primitives.
-
-## VS-G05 — Productization
-
-Add project templates, brand packs, reusable motion components, data/API adapters and a project scaffolder.
+- reusable project templates;
+- brand/theme packs;
+- reusable motion-component registry;
+- project scaffolder;
+- data/API adapters;
+- manifest presets for 16:9 / 9:16 / 1:1;
+- stronger transition primitives.
 
 ## VS-G06 — Scale
 

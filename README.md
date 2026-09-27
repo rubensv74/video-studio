@@ -20,11 +20,15 @@ This avoids coupling a video project to a single engine.
 - Timed music and voice-over tracks
 - Timed video clips
 - SRT captions
+- Animated SVG system diagrams
+- Deterministic HTML Canvas scenes
+- Three.js / React Three Fiber / WebGL rendering
 - MP4 H.264 output
 - WebM VP9/Opus derivatives
 - GIF derivatives
 - Numbered PNG image sequences
 - Configurable FFmpeg loudness normalization
+- Scene-level QA still extraction
 - CI-ready headless rendering
 - Multi-engine source architecture
 
@@ -50,9 +54,9 @@ Linux/macOS:
 ./scripts/bootstrap-unix.sh
 ```
 
-The bootstrap generates deterministic technical media fixtures, performs `npm ci`, type-checks both engines, renders the primary MP4, generates derivatives and verifies the full media stack.
+The bootstrap generates deterministic technical media fixtures, performs `npm ci`, type-checks both engines, renders the primary MP4, generates derivatives and verifies the media stack.
 
-Manual path:
+Manual media-stack path:
 
 ```bash
 npm ci
@@ -62,6 +66,15 @@ npm run render -- projects/demo-product/project.json
 npm run verify:render -- projects/demo-product/project.json
 npm run render:derivatives -- projects/demo-product/project.json
 npm run verify:media-stack -- projects/demo-product/project.json
+```
+
+Advanced visual demo:
+
+```bash
+npm run render:advanced
+npm run verify:render -- projects/advanced-visuals-demo/project.json
+npm run extract:advanced-qa
+npm run verify:advanced-qa
 ```
 
 ## Studios
@@ -84,7 +97,7 @@ Motion Canvas is retained as the specialist editor for technical/diagrammatic mo
 
 Projects live under `projects/<project-id>/project.json`.
 
-A manifest can now define:
+A manifest can define:
 
 - primary output;
 - semantic scenes;
@@ -102,9 +115,11 @@ The manifest remains the anti-lock-in boundary: render-engine code maps this neu
 - **VS-G01 — Multi-engine foundation:** VERIFIED
 - **VS-G02 — First Verified Render:** VERIFIED
 - **VS-G03 — Media Stack:** VERIFIED
-- **VS-G04 — Advanced Visuals:** NEXT
+- **VS-G04 — Advanced Visuals:** VERIFIED
+- **VS-G05 — Productization:** NEXT
 
 Reference evidence:
 
 - `docs/vs-g02-evidence.md`
 - `docs/vs-g03-evidence.md`
+- `docs/vs-g04-evidence.md`
