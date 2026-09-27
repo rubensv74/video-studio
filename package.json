@@ -29,7 +29,8 @@
     "typecheck": "npm run typecheck:remotion && npm run typecheck:motion-canvas",
     "fixtures:media": "node scripts/generate-media-fixtures.mjs",
     "render:derivatives": "node scripts/render-derivatives.mjs",
-    "verify:media-stack": "node scripts/verify-media-stack.mjs"
+    "verify:media-stack": "node scripts/verify-media-stack.mjs",
+    "render:productization": "node scripts/render-productization-fixtures.mjs"
   },
   "engines": {
     "node": ">=20"
