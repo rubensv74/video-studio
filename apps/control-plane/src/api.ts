@@ -3,16 +3,33 @@ import type {
   HealthResponse,
   RunsResponse,
   MediaHistoryResponse,
+  SessionResponse,
 } from './types';
+
+const tokenKey = 'video-studio.access-token';
+
+export const setControlPlaneAccessToken = (token: string) => {
+  if (typeof window === 'undefined') return;
+  const value = token.trim();
+  if (value) window.localStorage.setItem(tokenKey, value);
+  else window.localStorage.removeItem(tokenKey);
+};
+
+export const getControlPlaneAccessToken = () => {
+  if (typeof window === 'undefined') return '';
+  return window.localStorage.getItem(tokenKey) ?? '';
+};
 
 const request = async <T>(
   url: string,
   options?: RequestInit,
 ): Promise<T> => {
+  const token = getControlPlaneAccessToken();
   const response = await fetch(url, {
     ...options,
     headers: {
       'content-type': 'application/json',
+      ...(token ? {authorization: `Bearer ${token}`} : {}),
       ...(options?.headers ?? {}),
     },
   });
@@ -30,6 +47,7 @@ const request = async <T>(
 
 export const controlPlaneApi = {
   health: () => request<HealthResponse>('/api/health'),
+  session: () => request<SessionResponse>('/api/session'),
   catalog: () => request<CatalogResponse>('/api/catalog'),
   runs: () => request<RunsResponse>('/api/runs'),
   createProject: (payload: {

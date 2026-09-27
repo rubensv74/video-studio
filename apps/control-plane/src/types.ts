@@ -3,6 +3,14 @@ export type HealthResponse = {
   service: string;
   version: number;
   capabilities: string[];
+  accessMode?: 'development' | 'required';
+};
+
+export type SessionResponse = {
+  subject: string;
+  role: 'viewer' | 'operator' | 'admin';
+  provider: string;
+  accessMode: 'development' | 'required';
 };
 
 export type ProjectSummary = {

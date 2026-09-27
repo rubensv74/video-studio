@@ -1,11 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {controlPlaneApi} from './api';
+import {
+  controlPlaneApi,
+  getControlPlaneAccessToken,
+  setControlPlaneAccessToken,
+} from './api';
 import type {
   BatchSummary,
   CatalogResponse,
   HealthResponse,
   RunSummary,
   MediaAssetSummary,
+  SessionResponse,
 } from './types';
 
 const emptyCatalog: CatalogResponse = {
@@ -39,6 +44,8 @@ export const App: React.FC = () => {
   const [catalog, setCatalog] = useState<CatalogResponse>(emptyCatalog);
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [mediaAssets, setMediaAssets] = useState<MediaAssetSummary[]>([]);
+  const [session, setSession] = useState<SessionResponse | null>(null);
+  const [accessToken, setAccessToken] = useState(() => getControlPlaneAccessToken());
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
@@ -55,13 +62,16 @@ export const App: React.FC = () => {
   const refresh = async () => {
     try {
       setError(null);
-      const [healthData, catalogData, runsData, mediaData] = await Promise.all([
-        controlPlaneApi.health(),
+      const healthData = await controlPlaneApi.health();
+      setHealth(healthData);
+
+      const [sessionData, catalogData, runsData, mediaData] = await Promise.all([
+        controlPlaneApi.session(),
         controlPlaneApi.catalog(),
         controlPlaneApi.runs(),
         controlPlaneApi.media(),
       ]);
-      setHealth(healthData);
+      setSession(sessionData);
       setCatalog(catalogData);
       setRuns(runsData.runs);
       setMediaAssets(mediaData.assets);
@@ -84,6 +94,11 @@ export const App: React.FC = () => {
     const timer = window.setInterval(() => void refresh(), 5000);
     return () => window.clearInterval(timer);
   }, []);
+
+  const applyAccessToken = async () => {
+    setControlPlaneAccessToken(accessToken);
+    await refresh();
+  };
 
   const completedRuns = useMemo(
     () => runs.filter((run) => ['success', 'cached', 'completed'].includes(run.status)).length,
@@ -175,6 +190,13 @@ export const App: React.FC = () => {
           <span className="eyebrow">ENGINE</span>
           <StatusPill status={health?.status ?? 'loading'} />
           <small>{health?.capabilities.length ?? 0} capabilities online</small>
+          <small>
+            {session
+              ? `${session.role} · ${session.subject}`
+              : health?.accessMode === 'required'
+                ? 'authentication required'
+                : 'local development access'}
+          </small>
         </div>
       </aside>
 
@@ -184,9 +206,26 @@ export const App: React.FC = () => {
             <span className="eyebrow">PROGRAMMATIC VIDEO PLATFORM</span>
             <h1>Render operations</h1>
           </div>
-          <button className="button button--ghost" onClick={() => void refresh()}>
-            Refresh
-          </button>
+          <div style={{display: 'flex', gap: 10, alignItems: 'center'}}>
+            {health?.accessMode === 'required' && (
+              <>
+                <input
+                  aria-label="Access token"
+                  type="password"
+                  value={accessToken}
+                  onChange={(event) => setAccessToken(event.target.value)}
+                  placeholder="Access token"
+                  style={{minWidth: 220}}
+                />
+                <button className="button button--ghost" onClick={() => void applyAccessToken()}>
+                  Apply access
+                </button>
+              </>
+            )}
+            <button className="button button--ghost" onClick={() => void refresh()}>
+              Refresh
+            </button>
+          </div>
         </header>
 
         {error && <div className="error-banner">{error}</div>}

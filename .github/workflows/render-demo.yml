@@ -108,6 +108,7 @@ jobs:
             output/ai-media-demo.mp4
             output/ai-media-demo-frame.png
             output/generated-media/*.json
+            output/operations/*.json
             apps/remotion-studio/public/generated-media/**
             output/productization/*.mp4
             output/scale/*.json
