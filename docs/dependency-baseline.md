@@ -55,12 +55,28 @@ Motion Canvas engine packages are pinned together at 3.17.2:
 - `@motion-canvas/vite-plugin`
 - `@motion-canvas/ffmpeg`
 
-Vite remains on 4.x for the VS-G01 baseline. Motion Canvas' official 3.17.2 starter declares Vite `^4.0.0`.
+The Motion Canvas workspace intentionally pins:
+
+- TypeScript — 5.2.2
+- Vite — 4.5.14
+
+This follows the compatibility generation used by the official 3.17.2 TypeScript starter, which declares TypeScript `^5.2.2` and Vite `^4.0.0`.
+
+The workspace also includes the starter's required project type reference:
+
+```ts
+/// <reference types="@motion-canvas/core/project" />
+```
+
+That reference supplies Motion Canvas' `?scene` module declaration and project globals such as `Callback`.
+
+`skipLibCheck` is enabled only for the Motion Canvas workspace to isolate third-party WebCodecs declaration overlap while keeping Video Studio source files type-checked.
 
 Upstream evidence:
 
 - https://github.com/motion-canvas/motion-canvas/tree/v3.17.2
 - https://github.com/motion-canvas/motion-canvas/blob/v3.17.2/packages/create/template-2d-ts/package.json
+- https://github.com/motion-canvas/motion-canvas/blob/v3.17.2/packages/create/template-2d-ts/src/motion-canvas.d.ts
 - https://github.com/motion-canvas/motion-canvas/blob/v3.17.2/packages/docs/docs/getting-started/rendering/video.mdx
 
 ## Upgrade rule
