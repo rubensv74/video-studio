@@ -6,6 +6,8 @@ import {AdvancedSvgSystem} from '../components/AdvancedSvgSystem';
 import {AdvancedCanvasTelemetry} from '../components/AdvancedCanvasTelemetry';
 import {AdvancedThreeAsset} from '../components/AdvancedThreeAsset';
 import {BlueprintGrid} from '../components/BlueprintGrid';
+import {createSceneRegistry} from '../components/SceneRegistry';
+import {SceneTransition} from '../components/SceneTransition';
 
 const Shell: React.FC<React.PropsWithChildren<{eyebrow: string; title: string}>> = ({
   eyebrow,
@@ -42,39 +44,40 @@ const Shell: React.FC<React.PropsWithChildren<{eyebrow: string; title: string}>>
   </AbsoluteFill>
 );
 
-const AdvancedScene: React.FC<{scene: VideoScene}> = ({scene}) => {
-  if (scene.type === 'svg-system-flow') {
-    return (
-      <Shell eyebrow="VECTOR MOTION" title="Animated industrial system flow">
-        <AdvancedSvgSystem />
-      </Shell>
-    );
-  }
+const SvgScene: React.FC<{scene: VideoScene}> = () => (
+  <Shell eyebrow="VECTOR MOTION" title="Animated industrial system flow">
+    <AdvancedSvgSystem />
+  </Shell>
+);
 
-  if (scene.type === 'canvas-telemetry') {
-    return (
-      <Shell eyebrow="HTML CANVAS" title="Deterministic telemetry rendering">
-        <AdvancedCanvasTelemetry />
-      </Shell>
-    );
-  }
+const CanvasScene: React.FC<{scene: VideoScene}> = () => (
+  <Shell eyebrow="HTML CANVAS" title="Deterministic telemetry rendering">
+    <AdvancedCanvasTelemetry />
+  </Shell>
+);
 
-  if (scene.type === 'three-asset') {
-    return (
-      <Shell eyebrow="WEBGL / THREE.JS" title="Procedural industrial asset">
-        <div style={{position: 'absolute', inset: -190}}>
-          <AdvancedThreeAsset />
-        </div>
-      </Shell>
-    );
-  }
+const ThreeScene: React.FC<{scene: VideoScene}> = () => (
+  <Shell eyebrow="WEBGL / THREE.JS" title="Procedural industrial asset">
+    <div style={{position: 'absolute', inset: -190}}>
+      <AdvancedThreeAsset />
+    </div>
+  </Shell>
+);
 
-  return (
-    <Shell eyebrow="ADVANCED VISUALS" title={scene.id}>
-      <div style={{fontSize: 52}}>Unsupported scene type: {scene.type}</div>
-    </Shell>
-  );
-};
+const UnknownScene: React.FC<{scene: VideoScene}> = ({scene}) => (
+  <Shell eyebrow="ADVANCED VISUALS" title={scene.id}>
+    <div style={{fontSize: 52}}>Unsupported scene type: {scene.type}</div>
+  </Shell>
+);
+
+const AdvancedScene = createSceneRegistry(
+  {
+    'svg-system-flow': SvgScene,
+    'canvas-telemetry': CanvasScene,
+    'three-asset': ThreeScene,
+  },
+  UnknownScene,
+);
 
 export const AdvancedVisualsDemo: React.FC<VideoProjectManifest> = (project) => {
   let from = 0;
@@ -89,7 +92,9 @@ export const AdvancedVisualsDemo: React.FC<VideoProjectManifest> = (project) => 
         from += durationInFrames;
         return (
           <Sequence key={scene.id} from={start} durationInFrames={durationInFrames}>
-            <AdvancedScene scene={scene} />
+            <SceneTransition durationInFrames={durationInFrames}>
+              <AdvancedScene scene={scene} />
+            </SceneTransition>
           </Sequence>
         );
       })}
