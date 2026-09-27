@@ -19,13 +19,16 @@ else
   run_step "Initial dependency install" npm install --no-audit --no-fund
 fi
 
+run_step "Generate deterministic media fixtures" npm run fixtures:media
 run_step "Foundation checks" npm run check
-run_step "Render demo" npm run render -- projects/demo-product/project.json
-run_step "Verify rendered media" npm run verify:render -- projects/demo-product/project.json
+run_step "Render primary" npm run render -- projects/demo-product/project.json
+run_step "Verify primary" npm run verify:render -- projects/demo-product/project.json
+run_step "Render derivatives" npm run render:derivatives -- projects/demo-product/project.json
+run_step "Verify media stack" npm run verify:media-stack -- projects/demo-product/project.json
 
 test -f package-lock.json
 
 echo
-echo "PASS VS-G02 local bootstrap"
-echo "Output: output/remotion-demo.mp4"
-echo "Lockfile: package-lock.json"
+echo "PASS Video Studio local bootstrap"
+echo "Primary: output/remotion-demo.mp4"
+echo "Media stack: VERIFIED"

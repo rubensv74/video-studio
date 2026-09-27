@@ -14,6 +14,7 @@ apps/remotion-studio/remotion.config.ts
 apps/remotion-studio/src/Root.tsx
 apps/remotion-studio/src/components/BlueprintGrid.tsx
 apps/remotion-studio/src/components/GlassCard.tsx
+apps/remotion-studio/src/components/MediaLayer.tsx
 apps/remotion-studio/src/compositions/ProductDemo.tsx
 apps/remotion-studio/src/index.ts
 apps/remotion-studio/tsconfig.json
@@ -23,10 +24,12 @@ docs/capability-matrix.md
 docs/dependency-baseline.md
 docs/gates.md
 docs/licensing.md
+docs/media-stack.md
 docs/project-manifest.md
 docs/rendering.md
 docs/runner-diagnostic.md
 docs/vs-g02-evidence.md
+docs/vs-g03-evidence.md
 output/.gitkeep
 package-lock.json
 package.json
@@ -38,12 +41,15 @@ projects/demo-product/project.json
 scripts/bootstrap-unix.sh
 scripts/bootstrap-windows.ps1
 scripts/check-env.mjs
+scripts/generate-media-fixtures.mjs
 scripts/lib/dependency-contract.mjs
 scripts/lib/manifest.mjs
 scripts/postprocess.mjs
 scripts/probe-media.mjs
+scripts/render-derivatives.mjs
 scripts/render.mjs
 scripts/smoke-foundation.mjs
 scripts/validate-project.mjs
 scripts/verify-dependency-contract.mjs
+scripts/verify-media-stack.mjs
 scripts/verify-render.mjs

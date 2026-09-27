@@ -1,6 +1,6 @@
 # Rendering
 
-## One-command local validation
+## End-to-end local validation
 
 Windows PowerShell:
 
@@ -14,76 +14,49 @@ Linux/macOS:
 ./scripts/bootstrap-unix.sh
 ```
 
-The bootstrap performs, in order:
+The bootstrap:
 
-1. Node/npm/FFmpeg/ffprobe environment checks.
-2. deterministic `npm ci` when `package-lock.json` exists, otherwise initial `npm install`;
-3. source-contract and TypeScript checks;
-4. Remotion render from `projects/demo-product/project.json`;
-5. rendered-media verification with ffprobe;
-6. lockfile presence check.
+1. checks Node/npm/FFmpeg/ffprobe;
+2. installs dependencies from `package-lock.json`;
+3. generates deterministic media fixtures;
+4. runs source-contract and TypeScript checks;
+5. renders the primary Remotion MP4;
+6. verifies the primary media contract;
+7. generates WebM, GIF, PNG sequence and normalized MP4 derivatives;
+8. verifies the complete media stack.
 
-A successful run must leave:
+## Manual flow
 
-```text
-output/remotion-demo.mp4
-package-lock.json
+```bash
+npm ci
+npm run fixtures:media
+npm run check
+npm run render -- projects/demo-product/project.json
+npm run verify:render -- projects/demo-product/project.json
+npm run render:derivatives -- projects/demo-product/project.json
+npm run verify:media-stack -- projects/demo-product/project.json
 ```
 
-## Remotion — production path
-
-Preview:
+## Remotion Studio
 
 ```bash
 npm run dev:remotion
 ```
 
-Render demo:
-
-```bash
-npm run render:remotion
-```
-
-Or dispatch from manifest:
-
-```bash
-npm run render -- projects/demo-product/project.json
-```
-
-Verify the physical output against the manifest:
-
-```bash
-npm run verify:render -- projects/demo-product/project.json
-```
-
-The verifier asserts codec, width, height, FPS, duration tolerance and non-zero file size. It fails the process if the media contract is violated.
-
-For diagnostics only:
-
-```bash
-npm run probe -- output/remotion-demo.mp4
-```
-
-## Motion Canvas — specialist path
+## Motion Canvas
 
 ```bash
 npm run dev:motion-canvas
 ```
 
-Use the editor's Video Settings / Render controls and select the FFmpeg exporter.
+Use its Render controls with the FFmpeg exporter for specialist technical-animation work.
 
-This foundation does not pretend Motion Canvas has a stable documented headless CLI. If a future upstream version introduces one, the engine adapter can be upgraded without changing project manifests.
+## Diagnostics
 
-## FFmpeg post-processing
-
-Create a WebM derivative:
+Inspect a single file:
 
 ```bash
-npm run postprocess -- output/remotion-demo.mp4 output/remotion-demo.webm webm
+npm run probe -- output/remotion-demo.mp4
 ```
 
-Create a GIF derivative:
-
-```bash
-npm run postprocess -- output/remotion-demo.mp4 output/remotion-demo.gif gif
-```
+The strict project verifiers should be used for gates instead of relying on a manual probe.

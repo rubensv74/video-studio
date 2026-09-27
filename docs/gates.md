@@ -4,118 +4,104 @@
 
 **Status: VERIFIED — merged through PR #1**
 
-Verified capabilities:
+Verified:
 
-- repository structure;
-- JSON manifests;
-- neutral engine contract;
-- Remotion input-prop path from `project.json`;
-- manifest-driven width, height, FPS, duration and semantic scene payloads;
-- local-vs-global frame timing for sequenced scenes;
+- neutral project manifest;
+- Remotion production renderer;
 - Motion Canvas specialist workspace;
-- Motion Canvas FFmpeg exporter;
 - FFmpeg/ffprobe tooling;
-- dependency alignment contract;
-- source smoke gate;
-- strict rendered-media verifier;
-- Windows and Unix bootstrap scripts;
+- source-contract smoke tests;
+- dependency alignment;
 - CI workflow.
 
 ## VS-G02 — First verified render
 
-**Status: VERIFIED**
+**Status: VERIFIED — merged through PR #3**
 
-All exit criteria are satisfied.
+Verified from a clean GitHub-hosted runner:
 
-### Dependency and type-check evidence
+- committed npm lockfile;
+- deterministic `npm ci`;
+- both TypeScript workspaces;
+- physical H.264 render;
+- strict 1920x1080 / 30 FPS / 10 s media contract;
+- GitHub Actions artifact.
 
-GitHub Actions successfully completed:
-
-- standard hosted Ubuntu runner allocation;
-- FFmpeg installation;
-- npm dependency installation;
-- committed npm lockfile generation;
-- deterministic lockfile replay using `npm ci --no-audit --no-fund`;
-- Remotion TypeScript workspace;
-- Motion Canvas TypeScript workspace.
-
-Motion Canvas required alignment with its official 3.17.2 TypeScript starter:
-
-- `src/motion-canvas.d.ts` references `@motion-canvas/core/project`;
-- Motion Canvas workspace TypeScript is pinned to 5.2.2;
-- third-party WebCodecs declaration overlap is isolated with `skipLibCheck`.
-
-### Physical render evidence
-
-The lockfile-based verification run produced and validated:
-
-```text
-codec: h264
-geometry: 1920x1080
-fps: 30
-duration: 10s
-size: 838188 bytes
-```
-
-Validation command:
-
-```bash
-npm run verify:render -- projects/demo-product/project.json
-```
-
-Result:
-
-```text
-PASS VS-G02 rendered-media contract
-```
-
-The run uploaded a `video-studio-demo` artifact containing:
-
-- `output/remotion-demo.mp4`;
-- `package-lock.json`.
-
-Reference run:
-
-- workflow run: `36299172711`;
-- commit: `0826ebd04d1c046944b8f2225dc00c6262d7124a`;
-- artifact ID: `10925245396`.
-
-The artifact ZIP digest reported by GitHub is:
-
-```text
-sha256:0719007c5f9f126e3535a8a51e82a1133281cd45e01632deea5781042fed8ce2
-```
-
-The earlier verified render produced a slightly different encoded byte size. VS-G02 guarantees the declared media contract and dependency reproducibility, **not bit-for-bit identity of H.264 output across separate encoding runs**.
-
-### Runner blocker resolution
-
-The original CI blocker occurred while the repository was private and the account had exhausted its 2,000 included private-repository Actions minutes with an Actions budget of $0 and stop-usage enabled.
-
-After the repository became public, standard GitHub-hosted Ubuntu and Windows runners were allocated successfully.
-
-The runner diagnostic remains available only through manual `workflow_dispatch`.
-
-See `docs/runner-diagnostic.md`.
+See `docs/vs-g02-evidence.md`.
 
 ## VS-G03 — Media stack
+
+**Status: VERIFIED — PR #5**
+
+### Timed media tracks
+
+The neutral project manifest now supports:
+
+- voice-over;
+- music;
+- SFX;
+- ambient audio;
+- video clips;
+- SRT captions;
+- inline caption cues.
+
+Track contracts include timeline placement and media-specific controls such as duration, trims, volume, looping, video fit/layout and caption styling.
+
+### Deterministic fixture strategy
+
+CI generates its own technical media:
+
+- AAC music tone;
+- AAC voice-over placeholder tone;
+- H.264 test clip;
+- SRT subtitle file.
+
+The fixture strategy proves routing, timing, decoding, mixing and caption ingestion without external services or copyrighted media.
+
+### Verified primary media
+
+The reference Remotion render passed with:
+
+- H.264 primary video;
+- AAC audio stream;
+- 48 kHz sample rate;
+- manifest-driven video overlay;
+- manifest-driven SRT captions.
+
+Independent visual QA extracted a frame at 4 s from the successful artifact and confirmed that the base scene, generated video clip and active SRT subtitle were visible simultaneously.
+
+### Verified derivatives
+
+CI verified:
+
+- WebM: VP9 video + Opus audio;
+- GIF: GIF codec;
+- PNG sequence: 10 numbered PNG frames at 640 px;
+- normalized MP4 with measured integrated loudness of **-15.98 LUFS** for a configured target of **-16 LUFS**.
+
+### Reference execution
+
+- workflow run: `36300093257`;
+- commit: `cde2c33b2bcfbb6f8a4d56fe230f8036ed4d11a6`;
+- artifact: `video-studio-demo`;
+- artifact ID: `10925034371`;
+- artifact ZIP digest:
+  `sha256:e96ad28413f630b5a1c70fbc1824d2b7594c179287d334b6b0fa755317abdaf8`.
+
+See `docs/vs-g03-evidence.md`.
+
+## VS-G04 — Advanced visuals
 
 **Status: NEXT**
 
 Add and verify:
 
-- voice-over;
-- music;
-- captions/subtitles;
-- video clips;
-- image sequences;
-- WebM/GIF derivatives;
-- loudness normalization;
-- media timing/synchronization contracts.
-
-## VS-G04 — Advanced visuals
-
-Add and verify SVG motion primitives, technical diagrams, Canvas scenes and Three.js/WebGL scenes.
+- reusable SVG motion primitives;
+- Canvas visual components;
+- engineering/architecture diagram scenes;
+- Three.js / React Three Fiber / WebGL scenes;
+- still-frame visual QA;
+- reusable transition primitives.
 
 ## VS-G05 — Productization
 

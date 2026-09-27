@@ -1,19 +1,65 @@
 # Project manifest contract
 
-Each video project declares rendering intent in JSON.
+The project manifest is the engine-neutral source of truth for a video.
 
-Required fields:
+## Core
 
-- `id`: stable identifier.
-- `title`: human-readable name.
-- `engine`: `remotion` or `motion-canvas`.
-- `compositionId`: engine composition/project identifier.
-- `output`: width, height, fps, format and destination.
-- `theme`: shared theme identifier.
-- `scenes`: ordered semantic scene definitions.
+Every project declares:
 
-The contract is deliberately richer than the current demo so later AI tooling can generate a manifest without editing renderer internals.
+- `id`;
+- `title`;
+- `engine`;
+- `compositionId`;
+- `theme`;
+- `output`;
+- ordered semantic `scenes`.
 
-A scene may contain semantic `payload` data. Engine-specific code maps that payload to a visual implementation.
+## Media stack
 
-This is the anti-lock-in boundary of Video Studio.
+`media.audioTracks` supports roles:
+
+- `voiceover`;
+- `music`;
+- `sfx`;
+- `ambient`.
+
+Audio tracks can declare source, timeline start, duration, source trims, volume, loop and enabled state.
+
+`media.videoTracks` can declare source, timeline start, duration, trims, volume/mute, loop, object fit, opacity and layout.
+
+`media.captionTracks` supports:
+
+- external SRT sources;
+- inline caption cues;
+- timeline offset;
+- presentation settings.
+
+Local media paths are resolved through Remotion `staticFile()`. HTTP(S), data and blob sources remain direct URLs.
+
+## Derivatives
+
+`derivatives` can request:
+
+- `webm`;
+- `gif`;
+- `png-sequence`.
+
+Each derivative declares its own output path and may specify output FPS/width where applicable.
+
+## Audio normalization
+
+`audioNormalization` declares:
+
+- enabled state;
+- output file;
+- integrated loudness target;
+- true-peak target;
+- loudness-range target.
+
+The reference implementation maps this contract to FFmpeg `loudnorm`.
+
+## Backwards compatibility
+
+The original `audio.voiceover/music/captions` fields remain in the TypeScript contract for VS-G01 compatibility, but new projects should use `media`.
+
+The manifest stays neutral: it declares media intent, not Remotion component syntax or FFmpeg command lines.
