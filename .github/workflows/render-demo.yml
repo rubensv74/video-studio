@@ -60,6 +60,8 @@ jobs:
           git push origin "HEAD:${GITHUB_HEAD_REF}"
       - name: Validate foundation
         run: npm run check
+      - name: Build control plane
+        run: npm run build:control-plane
       - name: Render primary
         run: npm run render -- projects/demo-product/project.json
       - name: Verify primary
@@ -100,4 +102,5 @@ jobs:
             output/productization/*.mp4
             output/scale/*.json
             output/scale/cache/*.json
+            apps/control-plane/dist/**
             package-lock.json
