@@ -18,7 +18,14 @@ function Invoke-Step {
 Set-Location (Resolve-Path (Join-Path $PSScriptRoot ".."))
 
 Invoke-Step "Environment check" { node scripts/check-env.mjs }
-Invoke-Step "Install dependencies" { npm install --no-audit --no-fund }
+
+if (Test-Path "package-lock.json") {
+    Invoke-Step "Install dependencies from lockfile" { npm ci --no-audit --no-fund }
+}
+else {
+    Invoke-Step "Initial dependency install" { npm install --no-audit --no-fund }
+}
+
 Invoke-Step "Foundation checks" { npm run check }
 Invoke-Step "Render demo" { npm run render -- projects/demo-product/project.json }
 Invoke-Step "Verify rendered media" { npm run verify:render -- projects/demo-product/project.json }

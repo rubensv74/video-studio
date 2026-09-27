@@ -4,6 +4,7 @@
 .gitignore
 README.md
 apps/motion-canvas-studio/package.json
+apps/motion-canvas-studio/src/motion-canvas.d.ts
 apps/motion-canvas-studio/src/project.ts
 apps/motion-canvas-studio/src/scenes/blueprint.tsx
 apps/motion-canvas-studio/tsconfig.json
@@ -25,7 +26,9 @@ docs/licensing.md
 docs/project-manifest.md
 docs/rendering.md
 docs/runner-diagnostic.md
+docs/vs-g02-evidence.md
 output/.gitkeep
+package-lock.json
 package.json
 packages/contracts/package.json
 packages/contracts/src/index.ts
