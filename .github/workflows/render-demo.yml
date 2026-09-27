@@ -12,11 +12,11 @@ jobs:
   render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Source contract smoke test
@@ -76,7 +76,7 @@ jobs:
         run: npm run extract:advanced-qa
       - name: Verify advanced QA frames
         run: npm run verify:advanced-qa
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: video-studio-demo
           path: |
