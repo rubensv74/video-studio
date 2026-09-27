@@ -4,17 +4,15 @@
 |---|---|---|
 | React / TypeScript | Remotion | Verified |
 | CSS / HTML layout | Remotion | Verified |
-| SVG animation | Remotion + Motion Canvas | Verified physically in VS-G04 |
+| SVG animation | Remotion + Motion Canvas | Verified physically |
 | Technical 2D diagrams | Motion Canvas | Type-checked specialist path |
-| HTML Canvas | Remotion / browser | Verified physically in VS-G04 |
-| Three.js / WebGL | Remotion + `@remotion/three` | Verified physically in VS-G04 |
-| Images / screenshots | Shared assets + Remotion | Ready |
+| HTML Canvas | Remotion / browser | Verified physically |
+| Three.js / WebGL | Remotion + `@remotion/three` | Verified physically |
 | Video clips | Remotion `@remotion/media` | Verified |
 | Music / voice-over tracks | Remotion `@remotion/media` | Verified |
 | Captions / subtitles | `@remotion/captions` + Remotion | Verified |
 | SRT import | `@remotion/captions` | Verified |
-| Inline caption cues | Manifest + Remotion | Supported |
-| Reusable transitions | Shared `SceneTransition` | Verified in physical renders |
+| Reusable transitions | Shared `SceneTransition` | Verified physically |
 | Reusable scene registry | Shared `SceneRegistry` | Verified |
 | JSON-driven video | Project manifest | Verified |
 | Local JSON data | Data adapter | Verified |
@@ -32,11 +30,18 @@
 | Scene QA stills | FFmpeg + ffprobe | Verified |
 | Local headless render | Remotion | Verified |
 | CI render | Remotion | Verified |
+| Batch rendering | Scale layer | Verified physically |
+| Queue validation | Scale layer | Verified |
+| Controlled concurrency | Scale layer | Verified |
+| Failure isolation | Scale layer | Verified |
+| Deterministic render cache | Scale layer | Verified physically |
+| Output-integrity cache check | SHA-256 | Verified |
+| Retention/expiry metadata | Scale layer | Verified |
+| Batch reports | Scale layer | Verified |
+| Local worker adapter | Scale layer | Verified |
+| Provider-neutral HTTP worker | Scale layer | Boundary verified |
+| Concrete cloud distributed worker | External provider adapter | Not yet bound to a provider |
 | Motion Canvas headless CI | None | Blocked upstream / not foundational |
-| Batch rendering | Scale layer | VS-G06 |
-| Render queue / concurrency | Scale layer | VS-G06 |
-| Deterministic render cache | Scale layer | VS-G06 |
-| Cloud distributed render | Worker adapter boundary | VS-G06 |
 | AI-generated assets | External asset producer | Pluggable, not coupled |
 | TTS voice generation | External audio producer | Pluggable, not coupled |
 | Automatic subtitles | External transcription producer | Pluggable, not coupled |

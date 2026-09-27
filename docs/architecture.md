@@ -2,7 +2,7 @@
 
 ## Principle
 
-A video project must not know how it is rendered. It declares **what** it needs; an engine adapter decides **how** to produce it.
+A video project declares **what** it needs. Rendering, post-production and scale layers decide **how** to produce it.
 
 ```text
 Project Manifest
@@ -19,19 +19,40 @@ Remotion Adapter     Motion Canvas Adapter
 Headless Render      Specialist Editor/Exporter
       |                  |
       +---------+--------+
+                |
                 v
               FFmpeg
                 |
                 v
         MP4 / WebM / GIF / Audio / Stills
+
+Batch Contract
+      |
+      v
+Queue Executor
+      |
+      +---------------------------+
+      |                           |
+      v                           v
+Local Worker                HTTP Worker Boundary
+      |                           |
+      +------------+--------------+
+                   |
+                   v
+          Deterministic Cache
+                   |
+                   v
+         Reports / Retention
 ```
 
 ## Engine responsibilities
 
 ### Remotion
+
 Primary production renderer.
 
 Use it for:
+
 - product UI walkthroughs;
 - SaaS animations;
 - React component reuse;
@@ -44,9 +65,11 @@ Use it for:
 - batch/headless rendering.
 
 ### Motion Canvas
+
 Specialist engine.
 
 Use it for:
+
 - engineering diagrams;
 - animated flows;
 - architecture explainers;
@@ -54,35 +77,101 @@ Use it for:
 - geometry-heavy 2D scenes;
 - manually supervised authoring where its editor is valuable.
 
-It is intentionally not the CI-critical renderer in this foundation.
+It is intentionally not the CI-critical renderer.
 
 ### FFmpeg
+
 Final media layer.
 
 Use it for:
+
 - codec/container conversion;
 - concatenation;
 - muxing;
 - loudness normalization;
 - trimming;
 - audio extraction;
-- GIF/WebM derivatives;
+- GIF/WebM/PNG derivatives;
+- QA frame extraction;
 - inspection with ffprobe.
+
+## Productization layer
+
+`presets/` defines format profiles.
+
+`themes/` defines reusable brand/theme packs.
+
+`scripts/create-project.mjs` scaffolds neutral project manifests.
+
+Shared scene registry and transition primitives prevent composition-specific dispatch from becoming duplicated infrastructure.
+
+Data adapters resolve:
+
+- inline JSON;
+- local JSON files;
+- explicit HTTP JSON endpoints.
+
+## Scale layer
+
+The scale layer is intentionally separate from the project manifest.
+
+`batches/` defines queue intent:
+
+- job ids;
+- project manifests;
+- controlled concurrency;
+- cache policy;
+- retention policy;
+- worker type.
+
+### Queue
+
+The queue executor:
+
+- preserves result order;
+- limits active work to configured concurrency;
+- isolates failed jobs;
+- records duration/status/cache/output metadata.
+
+### Cache
+
+The render cache key includes:
+
+- project input directory fingerprint;
+- rendering source fingerprint;
+- design-system/theme/preset sources;
+- package-lock dependency fingerprint.
+
+Cache hits are accepted only when:
+
+- the record exists;
+- it has not expired;
+- the output exists;
+- the output SHA-256 still matches the stored record.
+
+### Worker boundary
+
+Two worker adapters are defined:
+
+- `local` — executes the repository renderer directly;
+- `http` — provider-neutral POST boundary for a future external/cloud worker.
+
+The external boundary is verified with a deterministic HTTP test, but no concrete cloud provider is mandatory.
 
 ## Shared layers
 
 `packages/contracts` owns neutral TypeScript contracts.
 
-`packages/design-system` owns visual tokens shared by all engines.
+`packages/design-system` owns visual tokens shared by renderers.
 
-`projects/` owns declarative video definitions and project-specific assets/configuration.
+`projects/` owns declarative video definitions.
 
 `assets/` stores reusable media. Large generated outputs never belong in Git.
 
-## Non-goals at Foundation Gate
+## Explicit non-goals
 
 - A full drag-and-drop NLE/editor.
 - A proprietary timeline UI.
-- Cloud rendering tied to one provider.
+- Coupling the manifest to AWS, Azure, Vercel or another provider.
 - AI service credentials committed to the repository.
 - Hiding third-party licensing requirements.

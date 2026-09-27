@@ -10,8 +10,9 @@ Video Studio separates **project intent** from **render engines**:
 - **Motion Canvas** — specialist authoring engine for diagrammatic and technical animation.
 - **FFmpeg** — post-production, muxing, transcode, loudness normalization and derivative generation.
 - **Shared contracts** — a neutral project manifest, design tokens, media conventions and rendering profiles.
+- **Scale layer** — provider-neutral batch queue, deterministic cache, retention metadata and worker adapters.
 
-This avoids coupling a video project to a single engine.
+This avoids coupling a video project to a single engine or cloud provider.
 
 ## Verified capabilities
 
@@ -34,6 +35,14 @@ This avoids coupling a video project to a single engine.
 - Runtime theme packs
 - Reusable scene registry and transitions
 - Inline, local JSON and HTTP JSON data adapters
+- Manifest-driven batch rendering
+- Controlled queue concurrency
+- Failure isolation
+- Deterministic render cache
+- Cache integrity verification
+- Retention/expiry metadata
+- Local and provider-neutral HTTP worker adapters
+- JSON batch reporting
 - CI-ready headless rendering
 - Multi-engine source architecture
 
@@ -59,11 +68,7 @@ Linux/macOS:
 ./scripts/bootstrap-unix.sh
 ```
 
-The bootstrap generates deterministic technical media fixtures, performs `npm ci`, type-checks both engines, renders the primary MP4, generates derivatives and verifies the media stack.
-
 ## Create a new project
-
-A project can now be scaffolded without manually writing `project.json`.
 
 ```bash
 npm run create:project -- \
@@ -84,13 +89,26 @@ Available verified themes:
 - `default-dark`
 - `blueprint-cyan`
 
-Productization checks:
+## Batch rendering and cache
+
+A batch is independent from the project manifest contract.
+
+Example:
 
 ```bash
-npm run test:productization
-npm run render:productization
-npm run verify:runtime-theme -- .generated/productization/generated-portrait-9x16/project.json
+npm run render:batch -- batches/productization-ci.json \
+  --clear-cache \
+  --report output/scale/batch-first.json
+
+npm run render:batch -- batches/productization-ci.json \
+  --report output/scale/batch-second.json
+
+npm run verify:scale-report -- \
+  output/scale/batch-first.json \
+  output/scale/batch-second.json
 ```
+
+The first execution physically renders cache misses. A repeated execution with unchanged inputs verifies output integrity and reuses deterministic cache records.
 
 ## Rendering
 
@@ -149,7 +167,7 @@ A manifest can define:
 - local JSON data;
 - HTTP JSON endpoints.
 
-The manifest remains the anti-lock-in boundary: render-engine code maps this neutral intent to Remotion, Motion Canvas or FFmpeg.
+The manifest remains the anti-lock-in boundary.
 
 ## Delivery status
 
@@ -158,7 +176,9 @@ The manifest remains the anti-lock-in boundary: render-engine code maps this neu
 - **VS-G03 — Media Stack:** VERIFIED
 - **VS-G04 — Advanced Visuals:** VERIFIED
 - **VS-G05 — Productization:** VERIFIED
-- **VS-G06 — Scale:** NEXT
+- **VS-G06 — Scale:** VERIFIED
+
+The original foundation roadmap G01–G06 is now closed.
 
 Reference evidence:
 
@@ -166,3 +186,4 @@ Reference evidence:
 - `docs/vs-g03-evidence.md`
 - `docs/vs-g04-evidence.md`
 - `docs/vs-g05-evidence.md`
+- `docs/vs-g06-evidence.md`
