@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: video-studio-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm run serve:control-plane
+    healthCheckPath: /api/health
+    envVars:
+      - key: VIDEO_STUDIO_PROFILE
+        value: production
+      - key: VIDEO_STUDIO_STORE_PROVIDER
+        value: supabase
+      - key: VIDEO_STUDIO_SUPABASE_SCHEMA
+        value: video_studio_api
+      - key: VIDEO_STUDIO_SUPABASE_URL
+        sync: false
+      - key: VIDEO_STUDIO_SUPABASE_SECRET_REF
+        value: env:VIDEO_STUDIO_SUPABASE_SECRET_KEY
+      - key: VIDEO_STUDIO_SUPABASE_SECRET_KEY
+        sync: false
+      - key: VIDEO_STUDIO_WORKER_URL
+        sync: false
+      - key: VIDEO_STUDIO_WORKER_CREDENTIAL_REF
+        value: env:VIDEO_STUDIO_WORKER_TOKEN
+      - key: VIDEO_STUDIO_WORKER_TOKEN
+        sync: false
+      - key: VIDEO_STUDIO_ALLOWED_ORIGINS
+        sync: false
+
+  - type: web
+    name: video-studio-worker
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.worker
+    healthCheckPath: /health
+    envVars:
+      - key: VIDEO_STUDIO_WORKER_TOKEN
+        sync: false
