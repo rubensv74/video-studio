@@ -25,6 +25,23 @@ export type AudioTrack = {
 
 export type MediaObjectFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 
+export type ImageTrack = {
+  id: string;
+  src: string;
+  startSeconds?: number;
+  durationSeconds?: number;
+  enabled?: boolean;
+  objectFit?: MediaObjectFit;
+  opacity?: number;
+  layout?: {
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    borderRadius?: number;
+  };
+};
+
 export type VideoTrack = {
   id: string;
   src: string;
@@ -69,6 +86,7 @@ export type CaptionTrack = {
 };
 
 export type MediaStack = {
+  imageTracks?: ImageTrack[];
   audioTracks?: AudioTrack[];
   videoTracks?: VideoTrack[];
   captionTracks?: CaptionTrack[];
