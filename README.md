@@ -42,7 +42,16 @@ Prerequisites:
 - npm
 - FFmpeg and ffprobe available in PATH
 
-The recommended path is the end-to-end bootstrap because it does not stop at compilation: it renders and verifies the media file.
+The repository includes a committed npm lockfile. Prefer deterministic installation:
+
+```bash
+npm ci
+npm run check
+npm run render -- projects/demo-product/project.json
+npm run verify:render -- projects/demo-product/project.json
+```
+
+Or use the end-to-end bootstrap.
 
 Windows PowerShell:
 
@@ -56,20 +65,10 @@ Linux/macOS:
 ./scripts/bootstrap-unix.sh
 ```
 
-Manual path:
-
-```bash
-npm install
-npm run check
-npm run render -- projects/demo-product/project.json
-npm run verify:render -- projects/demo-product/project.json
-```
-
 Expected output:
 
 ```text
 output/remotion-demo.mp4
-package-lock.json
 ```
 
 Remotion Studio:
@@ -100,7 +99,7 @@ The orchestrator validates the manifest and dispatches to the selected engine. F
 
 ### VS-G01 — Multi-engine foundation
 
-Source contract verified:
+**VERIFIED**
 
 - [x] Engine-neutral project contract
 - [x] Manifest-driven Remotion metadata and scene payloads
@@ -108,23 +107,28 @@ Source contract verified:
 - [x] FFmpeg post-processing entry point
 - [x] Environment, manifest and dependency validation
 - [x] Dependency-free smoke gate
-- [x] Rendered-media verifier tested with positive and negative FFmpeg fixtures
-- [x] CI workflow defined
+- [x] Strict rendered-media verifier
+- [x] CI workflow
 - [x] Capability, licensing, dependency and gate documentation
 - [x] Permanent repository established: `rubensv74/video-studio`
 
 ### VS-G02 — First Verified Render
 
-Still required:
+**VERIFIED**
 
-- [ ] Resolve GitHub-hosted runner allocation or use a network-enabled local runner
-- [ ] `npm install`
-- [ ] Generate and commit `package-lock.json`
-- [ ] TypeScript checks against installed dependencies
-- [ ] Physical Remotion H.264 render
-- [ ] Media-contract verification against the real Remotion output
-- [ ] GitHub Actions artifact
+- [x] Public-repository GitHub-hosted runner path
+- [x] npm lockfile generated and committed
+- [x] lockfile replay with `npm ci`
+- [x] Remotion TypeScript check
+- [x] Motion Canvas TypeScript check
+- [x] Physical Remotion H.264 render
+- [x] H.264 / 1920x1080 / 30 FPS / 10 s media verification
+- [x] GitHub Actions artifact containing MP4 + lockfile
 
-Current CI blocker is tracked in issue #2.
+Reference evidence is recorded in `docs/vs-g02-evidence.md`.
 
-See `docs/gates.md` and `docs/rendering.md` for the exact exit criteria.
+### Next gate
+
+**VS-G03 — Media Stack**
+
+Voice-over, music, captions/subtitles, video clips, image sequences, WebM/GIF derivatives and loudness normalization.

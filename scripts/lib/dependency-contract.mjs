@@ -64,11 +64,17 @@ export const verifyDependencyContract = ({remotionPackage, motionCanvasPackage})
   }
 
   exact('@motion-canvas/core', motionVersion, '3.17.2');
-  exact('Motion Canvas TypeScript', get(motionCanvasPackage.devDependencies, 'typescript'), '5.9.3');
+  exact(
+    'Motion Canvas TypeScript',
+    get(motionCanvasPackage.devDependencies, 'typescript'),
+    '5.2.2',
+  );
 
   const vite = get(motionCanvasPackage.devDependencies, 'vite');
   if (typeof vite !== 'string' || !vite.startsWith('4.')) {
-    errors.push(`Motion Canvas Vite baseline must stay on Vite 4.x for VS-G01; found ${String(vite)}`);
+    errors.push(
+      `Motion Canvas Vite baseline must stay on Vite 4.x for VS-G01; found ${String(vite)}`,
+    );
   }
 
   return errors;

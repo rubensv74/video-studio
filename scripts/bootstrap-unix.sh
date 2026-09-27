@@ -12,7 +12,13 @@ run_step() {
 }
 
 run_step "Environment check" node scripts/check-env.mjs
-run_step "Install dependencies" npm install --no-audit --no-fund
+
+if [[ -f package-lock.json ]]; then
+  run_step "Install dependencies from lockfile" npm ci --no-audit --no-fund
+else
+  run_step "Initial dependency install" npm install --no-audit --no-fund
+fi
+
 run_step "Foundation checks" npm run check
 run_step "Render demo" npm run render -- projects/demo-product/project.json
 run_step "Verify rendered media" npm run verify:render -- projects/demo-product/project.json

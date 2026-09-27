@@ -17,10 +17,10 @@ Linux/macOS:
 The bootstrap performs, in order:
 
 1. Node/npm/FFmpeg/ffprobe environment checks.
-2. `npm install`.
-3. source-contract and TypeScript checks.
-4. Remotion render from `projects/demo-product/project.json`.
-5. rendered-media verification with ffprobe.
+2. deterministic `npm ci` when `package-lock.json` exists, otherwise initial `npm install`;
+3. source-contract and TypeScript checks;
+4. Remotion render from `projects/demo-product/project.json`;
+5. rendered-media verification with ffprobe;
 6. lockfile presence check.
 
 A successful run must leave:
