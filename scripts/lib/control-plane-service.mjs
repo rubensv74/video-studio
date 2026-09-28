@@ -204,9 +204,37 @@ export const createControlPlaneService = ({
         }
       });
 
+  const reconcileDelegatedRuns = async (records) => {
+    if (!workerRuntime?.getJob) return records;
+
+    return Promise.all(records.map(async (record) => {
+      if (!['accepted', 'running'].includes(record.status) || !record.providerRunId) {
+        return record;
+      }
+      try {
+        const job = await workerRuntime.getJob(record.providerRunId);
+        const reconciled = {
+          ...record,
+          status: job.status ?? record.status,
+          completedAt: job.completedAt ?? record.completedAt,
+          exitCode: job.exitCode ?? record.exitCode,
+          error: job.error ?? record.error,
+        };
+        if (JSON.stringify(reconciled) !== JSON.stringify(record)) {
+          await store.upsertRun(reconciled);
+          liveRuns.set(record.id, reconciled);
+        }
+        return reconciled;
+      } catch {
+        return record;
+      }
+    }));
+  };
+
   const runs = async () => {
+    const persisted = await reconcileDelegatedRuns(await store.listRuns());
     const combined = [
-      ...(await store.listRuns()),
+      ...persisted,
       ...liveRuns.values(),
       ...reportRuns(),
     ];

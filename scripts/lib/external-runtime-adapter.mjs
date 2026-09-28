@@ -88,6 +88,7 @@ export const createExternalWorkerRuntime = ({
         method: 'POST',
         body: JSON.stringify(payload),
       }),
+    getJob: (runId) => request(`/jobs/${encodeURIComponent(runId)}`),
     circuitStatus: () => breaker.status(),
   };
 };
