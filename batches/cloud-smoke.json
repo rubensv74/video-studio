@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "cloud-smoke",
+  "concurrency": 1,
+  "cache": {
+    "enabled": false
+  },
+  "retention": {
+    "days": 1
+  },
+  "worker": {
+    "type": "local"
+  },
+  "jobs": [
+    {
+      "id": "demo-product",
+      "manifest": "projects/demo-product/project.json"
+    }
+  ]
+}
