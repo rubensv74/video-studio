@@ -192,6 +192,13 @@ const providerServer = http.createServer(async (request, response) => {
     return;
   }
 
+  if (url.pathname.startsWith('/worker/jobs/') && request.method === 'GET') {
+    const runId = decodeURIComponent(url.pathname.slice('/worker/jobs/'.length));
+    response.writeHead(200, {'content-type': 'application/json'});
+    response.end(JSON.stringify({jobId: runId, runId, status: 'success', exitCode: 0, completedAt: '2026-09-28T00:00:00.000Z'}));
+    return;
+  }
+
   if (url.pathname === '/worker/jobs' && request.method === 'POST') {
     state.workerJobCalls += 1;
     let body = '';
@@ -372,6 +379,15 @@ try {
     );
     console.log('PASS Control Plane delegates render to external worker');
     console.log('PASS external operational store receives delegated run state');
+
+    const reconciledResponse = await fetch(`${controlOrigin}/api/runs`);
+    assert.equal(reconciledResponse.status, 200);
+    const reconciledBody = await reconciledResponse.json();
+    const reconciledRun = reconciledBody.runs.find((run) => run.id === renderBody.runId);
+    assert.equal(reconciledRun.status, 'success');
+    assert.equal(reconciledRun.exitCode, 0);
+    assert.equal(state.runs.get(renderBody.runId).status, 'success');
+    console.log('PASS delegated worker completion reconciles into operational store');
   } finally {
     await new Promise((resolve, reject) =>
       controlServer.close((error) => (error ? reject(error) : resolve())),
