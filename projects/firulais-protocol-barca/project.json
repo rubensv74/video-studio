@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "id": "firulais-protocol-barca",
+  "title": "Firulais — Protocolo Barça",
+  "engine": "remotion",
+  "compositionId": "FirulaisMemeVertical",
+  "theme": "default-dark",
+  "output": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "format": "mp4",
+    "file": "output/firulais-protocol-barca.mp4"
+  },
+  "derivatives": [
+    {
+      "id": "whatsapp-gif-preview",
+      "format": "gif",
+      "file": "output/firulais-protocol-barca.gif",
+      "fps": 12,
+      "width": 540
+    }
+  ],
+  "scenes": [
+    {
+      "id": "panic",
+      "type": "firulais-meme",
+      "durationSeconds": 3.5,
+      "payload": {
+        "imageSrc": "firulais/firulais-placeholder.svg",
+        "kicker": "SALA DE CRISIS · REAL MADRID",
+        "headline": "No hay fútbol que celebrar",
+        "body": "Firulais revisa el marcador, los títulos y los argumentos. Empieza el pánico.",
+        "callout": "ESTADO: SIN ARGUMENTOS",
+        "motion": "zoom-in",
+        "accent": "#FFD21F"
+      }
+    },
+    {
+      "id": "alert",
+      "type": "firulais-alert",
+      "durationSeconds": 3,
+      "payload": {
+        "headline": "¡Activar protocolo Barça!",
+        "body": "Alarma roja. Hay que cambiar de tema.",
+        "buttonLabel": "BARÇA",
+        "accent": "#FFD21F"
+      }
+    },
+    {
+      "id": "operation",
+      "type": "firulais-meme",
+      "durationSeconds": 3.5,
+      "payload": {
+        "imageSrc": "firulais/firulais-placeholder.svg",
+        "kicker": "MODO BARÇA · ACTIVADO",
+        "headline": "Negreira · VAR · UEFA · Camp Nou · Lamine · Economía",
+        "body": "Todo vale para mantener la sala de crisis ocupada.",
+        "motion": "shake",
+        "accent": "#FFD21F"
+      }
+    },
+    {
+      "id": "outro",
+      "type": "firulais-outro",
+      "durationSeconds": 2.5,
+      "payload": {
+        "headline": "Cuando no hay fútbol que celebrar… siempre queda un Barça que investigar.",
+        "body": "Departamento de desvío de atención · abierto 24/7",
+        "emoji": "🐶",
+        "accent": "#FFD21F"
+      }
+    }
+  ]
+}
