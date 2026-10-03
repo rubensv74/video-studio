@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   AbsoluteFill,
-  Easing,
   Img,
   interpolate,
   Sequence,
@@ -45,6 +44,13 @@ const motionName = (value: unknown): MemeMotion => {
     : 'zoom-in';
 };
 
+const headlineFontSize = (value: string) => {
+  if (value.length > 62) return 58;
+  if (value.length > 45) return 68;
+  if (value.length > 30) return 78;
+  return 92;
+};
+
 const SceneStage: React.FC<
   React.PropsWithChildren<{accent?: string; danger?: boolean}>
 > = ({children, accent = '#FFD21F', danger = false}) => (
@@ -86,10 +92,10 @@ const AnimatedVisual: React.FC<{
   src?: string;
   emoji?: string;
   motion: MemeMotion;
-}> = ({src, emoji = '🐶', motion}) => {
+  sceneDurationInFrames: number;
+}> = ({src, emoji = '🐶', motion, sceneDurationInFrames}) => {
   const frame = useCurrentFrame();
-  const {durationInFrames} = useVideoConfig();
-  const end = Math.max(1, durationInFrames - 1);
+  const end = Math.max(1, sceneDurationInFrames - 1);
   const p = interpolate(frame, [0, end], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
@@ -154,6 +160,10 @@ const MemeScene: React.FC<{scene: VideoScene}> = ({scene}) => {
   const callout = text(payload.callout);
   const emoji = text(payload.emoji, '🐶');
   const motion = motionName(payload.motion);
+  const sceneDurationInFrames = Math.max(
+    1,
+    Math.round(scene.durationSeconds * fps),
+  );
 
   const enter = spring({
     frame,
@@ -168,7 +178,12 @@ const MemeScene: React.FC<{scene: VideoScene}> = ({scene}) => {
   return (
     <SceneStage accent={accent}>
       <AbsoluteFill>
-        <AnimatedVisual src={imageSrc || undefined} emoji={emoji} motion={motion} />
+        <AnimatedVisual
+          src={imageSrc || undefined}
+          emoji={emoji}
+          motion={motion}
+          sceneDurationInFrames={sceneDurationInFrames}
+        />
         <AbsoluteFill
           style={{
             background:
@@ -219,11 +234,11 @@ const MemeScene: React.FC<{scene: VideoScene}> = ({scene}) => {
       >
         <div
           style={{
-            fontSize: 92,
-            lineHeight: 0.94,
+            fontSize: headlineFontSize(headline),
+            lineHeight: 0.96,
             fontWeight: 1000,
             textTransform: 'uppercase',
-            letterSpacing: -2.4,
+            letterSpacing: -2.2,
           }}
         >
           {headline}
@@ -367,7 +382,10 @@ const OutroScene: React.FC<{scene: VideoScene}> = ({scene}) => {
     payload.headline,
     'Cuando no hay fútbol que celebrar… siempre queda un Barça que investigar.',
   );
-  const body = text(payload.body, 'Departamento de desvío de atención · abierto 24/7');
+  const body = text(
+    payload.body,
+    'Departamento de desvío de atención · abierto 24/7',
+  );
   const emoji = text(payload.emoji, '🐶');
   const enter = spring({frame, fps, config: {damping: 18, stiffness: 120}});
 
@@ -392,7 +410,7 @@ const OutroScene: React.FC<{scene: VideoScene}> = ({scene}) => {
         <div
           style={{
             marginTop: 44,
-            fontSize: 76,
+            fontSize: headlineFontSize(headline),
             lineHeight: 0.98,
             fontWeight: 1000,
             textAlign: 'center',
