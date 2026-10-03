@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22314d"/>
+      <stop offset="0.55" stop-color="#0b1120"/>
+      <stop offset="1" stop-color="#05070c"/>
+    </linearGradient>
+    <radialGradient id="fur" cx="45%" cy="34%" r="68%">
+      <stop offset="0" stop-color="#f1bf79"/>
+      <stop offset="0.62" stop-color="#bd7b3d"/>
+      <stop offset="1" stop-color="#6c3d22"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <g opacity=".16" stroke="#fff" stroke-width="2">
+    <path d="M0 240H1080M0 480H1080M0 720H1080M0 960H1080M0 1200H1080M0 1440H1080M0 1680H1080"/>
+    <path d="M180 0V1920M360 0V1920M540 0V1920M720 0V1920M900 0V1920"/>
+  </g>
+  <g transform="translate(540 920)">
+    <path d="M-330-210L-470-560L-120-360Z" fill="#a86535" stroke="#f0bd79" stroke-width="26"/>
+    <path d="M330-210L470-560L120-360Z" fill="#a86535" stroke="#f0bd79" stroke-width="26"/>
+    <ellipse cx="0" cy="-40" rx="390" ry="430" fill="url(#fur)" stroke="#e2a861" stroke-width="28"/>
+    <ellipse cx="-145" cy="-95" rx="82" ry="105" fill="#fff"/>
+    <ellipse cx="145" cy="-95" rx="82" ry="105" fill="#fff"/>
+    <ellipse cx="-125" cy="-72" rx="38" ry="55" fill="#13161e"/>
+    <ellipse cx="125" cy="-72" rx="38" ry="55" fill="#13161e"/>
+    <circle cx="-110" cy="-90" r="12" fill="#fff"/>
+    <circle cx="140" cy="-90" r="12" fill="#fff"/>
+    <path d="M-64 28Q0-12 64 28Q0 92-64 28Z" fill="#1a1514"/>
+    <ellipse cx="0" cy="155" rx="165" ry="120" fill="#2b1715"/>
+    <ellipse cx="0" cy="175" rx="100" ry="60" fill="#e16c74"/>
+    <path d="M-210 36Q-255 150-238 270" fill="none" stroke="#9fddff" stroke-width="24" stroke-linecap="round"/>
+    <path d="M210 36Q255 150 238 270" fill="none" stroke="#9fddff" stroke-width="24" stroke-linecap="round"/>
+    <circle cx="-238" cy="292" r="28" fill="#9fddff"/>
+    <circle cx="238" cy="292" r="28" fill="#9fddff"/>
+    <path d="M-350 385Q0 560 350 385L295 650H-295Z" fill="#f5f5f5" stroke="#d7dbe2" stroke-width="18"/>
+    <path d="M-210 430H210" stroke="#d4af37" stroke-width="22"/>
+    <circle cx="0" cy="520" r="92" fill="#fff" stroke="#d4af37" stroke-width="18"/>
+    <text x="0" y="548" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="900" fill="#18356f">RM</text>
+  </g>
+  <text x="540" y="1680" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="900" fill="#ffffff">FIRULAIS</text>
+  <text x="540" y="1760" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" fill="#FFD21F">PLACEHOLDER · SUSTITUIR POR PNG FINAL</text>
+</svg>

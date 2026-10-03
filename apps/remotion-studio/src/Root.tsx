@@ -3,11 +3,14 @@ import {Composition, type CalculateMetadataFunction} from 'remotion';
 import type {VideoProjectManifest} from '@video-studio/contracts';
 import demoManifestJson from '../../../projects/demo-product/project.json';
 import advancedManifestJson from '../../../projects/advanced-visuals-demo/project.json';
+import firulaisManifestJson from '../../../projects/firulais-protocol-barca/project.json';
 import {ProductDemo} from './compositions/ProductDemo';
 import {AdvancedVisualsDemo} from './compositions/AdvancedVisualsDemo';
+import {FirulaisMemeVertical} from './compositions/FirulaisMemeVertical';
 
 const demoManifest = demoManifestJson as VideoProjectManifest;
 const advancedManifest = advancedManifestJson as VideoProjectManifest;
+const firulaisManifest = firulaisManifestJson as VideoProjectManifest;
 
 const getDurationInFrames = (project: VideoProjectManifest) =>
   Math.max(
@@ -47,6 +50,16 @@ export const Root: React.FC = () => (
       width={advancedManifest.output.width}
       height={advancedManifest.output.height}
       defaultProps={advancedManifest}
+      calculateMetadata={calculateMetadata}
+    />
+    <Composition
+      id={firulaisManifest.compositionId}
+      component={FirulaisMemeVertical}
+      durationInFrames={getDurationInFrames(firulaisManifest)}
+      fps={firulaisManifest.output.fps}
+      width={firulaisManifest.output.width}
+      height={firulaisManifest.output.height}
+      defaultProps={firulaisManifest}
       calculateMetadata={calculateMetadata}
     />
   </>
