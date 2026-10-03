@@ -86,6 +86,12 @@ jobs:
         run: npm run render:ai-media
       - name: Verify AI media adapter demo
         run: npm run verify:ai-media
+      - name: Render Firulais WhatsApp meme
+        run: npm run render:firulais
+      - name: Verify Firulais WhatsApp meme
+        run: npm run verify:render -- projects/firulais-protocol-barca/project.json
+      - name: Render Firulais GIF derivative
+        run: npm run render:derivatives -- projects/firulais-protocol-barca/project.json
       - name: Render scaffolded product presets
         run: npm run render:productization
       - name: Verify runtime theme pack
@@ -109,6 +115,8 @@ jobs:
             output/advanced-visuals-qa/*.png
             output/ai-media-demo.mp4
             output/ai-media-demo-frame.png
+            output/firulais-protocol-barca.mp4
+            output/firulais-protocol-barca.gif
             output/generated-media/*.json
             output/operations/*.json
             apps/remotion-studio/public/generated-media/**
